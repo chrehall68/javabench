@@ -1,3 +1,4 @@
+import sort.MergeSort;
 import sort.Radix;
 
 import java.util.ArrayList;
@@ -12,7 +13,7 @@ public class Main {
         int[] tests = {10, (int)1e5, (int)1e7};
         int min = -(int)1e8;
         int max = (int)1e8;
-        int[] bases = {2, 7, 10, 24, -1};
+        int[] bases = {2, 7, 10, 24, 0, -1};
         ArrayList<Random> randoms = new ArrayList<>();
         for (int i = 0; i < bases.length; ++i){
             randoms.add(new Random(2024));
@@ -31,8 +32,11 @@ public class Main {
 
                 // run test
                 long startTime = System.nanoTime();
-                if (bases[baseIdx] != -1) {
+                if (bases[baseIdx] > 1) {
                     Radix.sort(arr, bases[baseIdx]);
+                }
+                else if (bases[baseIdx] == 0){
+                    MergeSort.sort(arr);
                 }
                 else{
                     Arrays.sort(arr);
