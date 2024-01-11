@@ -1,29 +1,6 @@
 package sort;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.LinkedBlockingDeque;
-
 public class Radix{
-    @SafeVarargs
-    private static void emptyBuckets(int[] arr, LinkedBlockingDeque<Integer>...buckets){
-        int idx = 0;
-        for (LinkedBlockingDeque<Integer> bucket : buckets){
-            while (!bucket.isEmpty()){
-                arr[idx] = bucket.poll();
-                ++idx;
-            }
-        }
-    }
-    private static void emptyBuckets(int[] arr, List<LinkedBlockingDeque<Integer>> buckets){
-        int idx = 0;
-        for (LinkedBlockingDeque<Integer> bucket : buckets){
-            while (!bucket.isEmpty()){
-                arr[idx] = bucket.poll();
-                ++idx;
-            }
-        }
-    }
     private static int getMaxPower(int[] arr, int base){
         int maxPower = 0;
         int curPower;
@@ -56,39 +33,67 @@ public class Radix{
         int maxPower = getMaxPower(arr, 2);
 
         // initialize buckets
-        LinkedBlockingDeque<Integer> bucket1 = new LinkedBlockingDeque<>();
-        LinkedBlockingDeque<Integer> bucket0 = new LinkedBlockingDeque<>();
+        int[] bucket0 = new int[arr.length];
+        int[] bucket1 = new int[arr.length];
 
         // sort
         int curVal = 1;
         for (int i = 0; i < maxPower; ++i){
+            int bucket0Idx = 0;
+            int bucket1Idx = 0;
+
             // go through the arr and add to the buckets
             for (int val : arr){
                 if ( ((val < 0 ? -val : val) & curVal) != 0 ){
-                    bucket1.add(val);
+                    bucket1[bucket1Idx] = val;
+                    ++bucket1Idx;
                 }
                 else{
-                    bucket0.add(val);
+                    bucket0[bucket0Idx] = val;
+                    ++bucket0Idx;
                 }
             }
 
             // now empty the buckets into the arr
-            emptyBuckets(arr, bucket0, bucket1);
+            int arrIdx = 0;
+            while (arrIdx < arr.length){
+                if (arrIdx < bucket0Idx){
+                    arr[arrIdx] = bucket0[arrIdx];
+                }
+                else{
+                    arr[arrIdx] = bucket1[arrIdx - bucket0Idx];
+                }
+                ++arrIdx;
+            }
 
             // increment curVal
             curVal <<= 1;
         }
 
         // sort by negatives
+        int bucket0Idx = 0;
+        int bucket1Idx = 0;
         for (int val : arr){
             if (val < 0){
-                bucket0.addFirst(val);
+                bucket0[bucket0Idx] = val;
+                ++bucket0Idx;
             }
             else{
-                bucket1.add(val);
+                bucket1[bucket1Idx] = val;
+                ++bucket1Idx;
             }
         }
-        emptyBuckets(arr, bucket0, bucket1);
+        // empty buckets
+        int arrIdx = 0;
+        while (arrIdx < arr.length){
+            if (arrIdx < bucket0Idx){
+                arr[arrIdx]  = bucket0[bucket0Idx-1-arrIdx];
+            }
+            else{
+                arr[arrIdx] = bucket1[arrIdx-bucket0Idx];
+            }
+            ++arrIdx;
+        }
     }
     public static void sort(int[] arr, int base){
         assert base > 1;
@@ -100,30 +105,56 @@ public class Radix{
         int maxPower = getMaxPower(arr, base);
 
         // initialize buckets
-        ArrayList<LinkedBlockingDeque<Integer>> buckets = new ArrayList<>(base);
-        for (int i = 0; i < base; ++i){
-            buckets.add(new LinkedBlockingDeque<>());
-        }
+        int[][] buckets = new int[base][arr.length];
 
         // sort
         int curVal = 1;
         for (int i = 0; i < maxPower; ++i){
+            int[] idxs = new int[base];
             for (int val: arr){
-                buckets.get(((val < 0 ? -val : val) / curVal) % base).add(val);
+                int idx = ((val < 0 ? -val : val) / curVal) % base;
+
+                buckets[idx][idxs[idx]] = val;
+                ++idxs[idx];
             }
-            emptyBuckets(arr, buckets);
+
+            // empty buckets
+            int arrIdx = 0;
+            for (int baseIdx = 0; baseIdx < base; ++baseIdx){
+                int tempIdx = 0;
+                while (tempIdx < idxs[baseIdx]){
+                    arr[arrIdx] = buckets[baseIdx][tempIdx];
+                    ++tempIdx;
+                    ++arrIdx;
+                }
+            }
             curVal *= base;
         }
 
         // take care of negatives
+        // sort by negatives
+        int bucket0Idx = 0;
+        int bucket1Idx = 0;
         for (int val : arr){
             if (val < 0){
-                buckets.get(0).addFirst(val);
+                buckets[0][bucket0Idx] = val;
+                ++bucket0Idx;
             }
             else{
-                buckets.get(1).add(val);
+                buckets[1][bucket1Idx] = val;
+                ++bucket1Idx;
             }
         }
-        emptyBuckets(arr, buckets);
+        // empty buckets
+        int arrIdx = 0;
+        while (arrIdx < arr.length){
+            if (arrIdx < bucket0Idx){
+                arr[arrIdx]  = buckets[0][bucket0Idx-1-arrIdx];
+            }
+            else{
+                arr[arrIdx] = buckets[1][arrIdx-bucket0Idx];
+            }
+            ++arrIdx;
+        }
     }
 }

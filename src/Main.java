@@ -12,7 +12,7 @@ public class Main {
         int[] tests = {10, (int)1e5, (int)1e7};
         int min = -(int)1e8;
         int max = (int)1e8;
-        int[] bases = {2, 7, 10, -1};
+        int[] bases = {2, 7, 10, 24, -1};
         ArrayList<Random> randoms = new ArrayList<>();
         for (int i = 0; i < bases.length; ++i){
             randoms.add(new Random(2024));
