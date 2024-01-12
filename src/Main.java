@@ -1,12 +1,14 @@
 import sort.MergeSort;
 import sort.QuickSort;
 import sort.Radix;
+import structures.AVL;
 import structures.JBLinkedList;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.Random;
+import java.util.TreeMap;
 
 public class Main {
     public static void stressTest() {
@@ -107,11 +109,81 @@ public class Main {
             System.out.println("this averages to " + (double) (endTime - startTime) / (double) n + "ns");
             System.out.println("or about " + (double) (endTime - startTime) / (double) n / 1e9 + "s");
         }
+    }
 
+    public static void treeTest() {
+        TreeMap<Integer, Integer> realLinkedList = new TreeMap<>();
+        AVL<Integer, Integer> jbLinkedList = new AVL<>();
+
+        int[] tests = { (int) 1e3, (int) 1e5, (int) 1e6 };
+        int n = 10; // do 10 tests and average
+        Random random = new Random(2024);
+        int max = (int) 1e8;
+        int min = (int) -1e8;
+
+        // test
+        for (int test : tests) {
+            System.out.println("===============");
+            System.out.println("testing for " + test);
+            Integer[] arr = new Integer[test];
+            Integer[] toGet = new Integer[test / 2];
+            Integer[] toRemove = new Integer[test / 4];
+
+            // initialize array
+            for (int i = 0; i < test; ++i) {
+                arr[i] = random.nextInt(max - min) + min;
+            }
+            for (int i = 0; i < toGet.length; ++i) {
+                toGet[i] = random.nextInt(test);
+            }
+            for (int i = 0; i < toRemove.length; ++i) {
+                toRemove[i] = random.nextInt(max - min) + min;
+            }
+
+            // run test
+            long startTime = System.nanoTime();
+            for (int attempt = 0; attempt < n; ++attempt) {
+                for (Integer i : arr) {
+                    realLinkedList.put(i, i);
+                }
+                for (Integer i : toGet) {
+                    assert realLinkedList.get(arr[i]).equals(arr[i]);
+                }
+                for (Integer i : toRemove) {
+                    realLinkedList.remove(i);
+                }
+                realLinkedList.clear();
+            }
+            long endTime = System.nanoTime();
+            System.out.println("took " + (endTime - startTime) + "ns for real treemap");
+            System.out.println("this averages to " + (double) (endTime - startTime) / (double) n + "ns");
+            System.out.println("or about " + (double) (endTime - startTime) / (double) n / 1e9 + "s");
+            System.out.println("------------");
+
+            // run test
+            startTime = System.nanoTime();
+            for (int attempt = 0; attempt < n; ++attempt) {
+                for (Integer i : arr) {
+                    jbLinkedList.put(i, i);
+                }
+                for (Integer i : toGet) {
+                    assert realLinkedList.get(i).equals(i);
+                }
+                for (Integer i : toRemove) {
+                    jbLinkedList.remove(i);
+                }
+                jbLinkedList.clear();
+            }
+            endTime = System.nanoTime();
+            System.out.println("took " + (endTime - startTime) + "ns for avl tree");
+            System.out.println("this averages to " + (double) (endTime - startTime) / (double) n + "ns");
+            System.out.println("or about " + (double) (endTime - startTime) / (double) n / 1e9 + "s");
+        }
     }
 
     public static void main(String[] args) {
         // stressTest();
-        llTest();
+        // llTest();
+        treeTest();
     }
 }
