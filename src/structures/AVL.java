@@ -9,6 +9,7 @@ import java.util.NoSuchElementException;
 import java.util.Set;
 import java.util.function.Consumer;
 
+@SuppressWarnings("unchecked")
 public class AVL<K extends Comparable<K>, V> implements Map<K, V> {
     private class AVLBFSIterator implements Iterator<Node> {
         ArrayList<Node> curLevel;

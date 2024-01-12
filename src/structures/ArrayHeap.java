@@ -8,6 +8,7 @@ import java.util.NoSuchElementException;
 import java.util.Queue;
 import java.util.function.Predicate;
 
+@SuppressWarnings("unchecked")
 public class ArrayHeap<E> implements Queue<E> {
     private class HeapIterator implements Iterator<E> {
         int idx;

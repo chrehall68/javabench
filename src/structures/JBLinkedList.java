@@ -7,6 +7,7 @@ import java.util.Iterator;
 import java.util.NoSuchElementException;
 import java.util.function.Predicate;
 
+@SuppressWarnings("unchecked")
 public class JBLinkedList<T> implements Deque<T> {
 
     private class Node {

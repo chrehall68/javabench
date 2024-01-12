@@ -3,6 +3,7 @@ import sort.QuickSort;
 import sort.Radix;
 import structures.AVL;
 import structures.ArrayHeap;
+import structures.BinomialHeap;
 import structures.JBLinkedList;
 
 import java.util.ArrayList;
@@ -10,6 +11,7 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.PriorityQueue;
+import java.util.Queue;
 import java.util.Random;
 import java.util.TreeMap;
 
@@ -184,12 +186,39 @@ public class Main {
         }
     }
 
+    public static void pqHelper(Queue<Integer> q, Integer[] arr, int attempts, String name) {
+        // run test
+        long startTime = System.nanoTime();
+        for (int attempt = 0; attempt < attempts; ++attempt) {
+            for (Integer i : arr) {
+                q.add(i);
+            }
+            Integer temp = Integer.MIN_VALUE;
+            for (int i = 0; i < arr.length; ++i) {
+                Integer val = q.poll();
+                if (temp.compareTo(val) > 0) {
+                    System.out.println(
+                            "Something went wrong while testing " + name + "; " + temp + " is not less than " + val);
+                    return;
+                }
+                temp = val;
+            }
+            q.clear();
+        }
+        long endTime = System.nanoTime();
+        System.out.println("took " + (endTime - startTime) + "ns for " + name);
+        System.out.println("this averages to " + (double) (endTime - startTime) / (double) attempts + "ns");
+        System.out.println("or about " + (double) (endTime - startTime) / (double) attempts / 1e9 + "s");
+        System.out.println("------------");
+    }
+
     public static void pqTest() {
         PriorityQueue<Integer> pqueue = new PriorityQueue<>();
-        ArrayHeap<Integer> arrayHeap = new ArrayHeap<>();
+        ArrayHeap<Integer> arrayHeap = new ArrayHeap<>(Comparator.reverseOrder());
+        BinomialHeap<Integer> bHeap = new BinomialHeap<>();
 
-        int[] tests = { (int) 1e3, (int) 1e5, (int) 1e6 };
-        int n = 10; // do 10 tests and average
+        int[] tests = { (int) 1e3, (int) 1e5, (int) 1e6, };
+        int n = 20; // do 20 tests and average
         Random random = new Random(2024);
         int max = (int) 1e8;
         int min = (int) -1e8;
@@ -199,51 +228,15 @@ public class Main {
             System.out.println("===============");
             System.out.println("testing for " + test);
             Integer[] arr = new Integer[test];
-            Integer[] toGet = new Integer[test / 2];
-            Integer[] toRemove = new Integer[test / 4];
 
             // initialize array
             for (int i = 0; i < test; ++i) {
                 arr[i] = random.nextInt(max - min) + min;
             }
-            // run test
-            long startTime = System.nanoTime();
-            for (int attempt = 0; attempt < n; ++attempt) {
-                for (Integer i : arr) {
-                    arrayHeap.add(i);
-                }
-                Integer temp = Integer.MIN_VALUE;
-                for (int i = 0; i < test; ++i) {
-                    Integer val = arrayHeap.poll();
-                    assert temp < val;
-                    temp = val;
-                }
-                arrayHeap.clear();
-            }
-            long endTime = System.nanoTime();
-            System.out.println("took " + (endTime - startTime) + "ns for arrayheap");
-            System.out.println("this averages to " + (double) (endTime - startTime) / (double) n + "ns");
-            System.out.println("or about " + (double) (endTime - startTime) / (double) n / 1e9 + "s");
 
-            // run test
-            startTime = System.nanoTime();
-            for (int attempt = 0; attempt < n; ++attempt) {
-                for (Integer i : arr) {
-                    pqueue.add(i);
-                }
-                Integer temp = Integer.MIN_VALUE;
-                for (int i = 0; i < test; ++i) {
-                    Integer val = pqueue.poll();
-                    assert temp < val;
-                    temp = val;
-                }
-                pqueue.clear();
-            }
-            endTime = System.nanoTime();
-            System.out.println("took " + (endTime - startTime) + "ns for real pqueue");
-            System.out.println("this averages to " + (double) (endTime - startTime) / (double) n + "ns");
-            System.out.println("or about " + (double) (endTime - startTime) / (double) n / 1e9 + "s");
-            System.out.println("------------");
+            pqHelper(pqueue, arr, n, "pqueue");
+            pqHelper(arrayHeap, arr, n, "arrayHeap");
+            pqHelper(bHeap, arr, n, "binomial Heap");
 
         }
     }
@@ -253,5 +246,21 @@ public class Main {
         // llTest();
         // treeTest();
         pqTest();
+
+        // BinomialHeap<Integer> bHeap = new BinomialHeap<>();
+        // Random temp = new Random(2024);
+        // for (int i = 0; i < 1000; ++i) {
+        // bHeap.add(temp.nextInt(50));
+        // }
+        // int prev = -1;
+        // while (!bHeap.isEmpty()) {
+        // int val = bHeap.poll();
+        // if (prev > val) {
+        // System.out.println("NOPE!!!");
+        // }
+        // prev = val;
+        // }
+        // System.out.println("that worked!");
+
     }
 }
