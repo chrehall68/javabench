@@ -11,7 +11,6 @@ import structures.SCHashMap;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.PriorityQueue;
@@ -388,6 +387,10 @@ public class Main {
         // treeTest();
         // pqTest();
         // hashmapTest();
-        qTest();
+        // qTest();
+
+        Integer[] arr = { 6, 3, 8, 1, 9, 4, 8 };
+        ArrayHeap.heapSort(arr);
+        System.out.println(Arrays.toString(arr));
     }
 }

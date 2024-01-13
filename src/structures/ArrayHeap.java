@@ -45,7 +45,7 @@ public class ArrayHeap<E> implements Queue<E> {
     private int height;
 
     public ArrayHeap() {
-        this(null);
+        this(INITIAL_SIZE);
     }
 
     public ArrayHeap(int initialSize) {
@@ -68,6 +68,11 @@ public class ArrayHeap<E> implements Queue<E> {
         heap = (E[]) new Object[(1 << height) - 1];
     }
 
+    private ArrayHeap(Object[] arr) {
+        heap = (E[]) arr;
+        last = arr.length;
+    }
+
     // ==============================
     // Misc Section
     // ==============================
@@ -86,6 +91,25 @@ public class ArrayHeap<E> implements Queue<E> {
             ret[i] = (T) heap[i];
         }
         return ret;
+    }
+
+    /**
+     * Sorts arr in-place in increasing order
+     * 
+     * @param <E> - type of the array
+     * @param arr - the array to be sorted, in-place
+     */
+    public static <E> void heapSort(E[] arr) {
+        ArrayHeap<E> h = new ArrayHeap<E>((Object[]) arr);
+        // first, heapify
+        for (int i = 0; i < arr.length; ++i) {
+            h.heapifyDown(i);
+        }
+
+        // next, extract maxes and put them at the end
+        for (int i = arr.length - 1; i > -1; --i) {
+            arr[i] = h.poll();
+        }
     }
 
     @Override
