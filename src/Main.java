@@ -213,8 +213,8 @@ public class Main {
     }
 
     public static void pqTest() {
-        PriorityQueue<Integer> pqueue = new PriorityQueue<>();
-        ArrayHeap<Integer> arrayHeap = new ArrayHeap<>(Comparator.reverseOrder());
+        PriorityQueue<Integer> pqueue = new PriorityQueue<>((int) 1e6, Comparator.naturalOrder());
+        ArrayHeap<Integer> arrayHeap = new ArrayHeap<>((int) 1e6, Comparator.reverseOrder());
         BinomialHeap<Integer> bHeap = new BinomialHeap<>();
 
         int[] tests = { (int) 1e3, (int) 1e5, (int) 1e6, };

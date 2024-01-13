@@ -120,7 +120,6 @@ public class BinomialHeap<E> implements Queue<E> {
                 prev = n;
                 n.next = this;
             } else {
-                // System.out.println("SetPrev called when prev wasn't null...");
                 // take care of the chance that there was smth at prev
                 BinomialTree temp = prev;
                 if (temp != null) {
@@ -282,7 +281,6 @@ public class BinomialHeap<E> implements Queue<E> {
             return null;
         }
         E minVal = peek();
-        // System.out.println("min is " + min);
         BinomialTree prev = min.prev;
         BinomialTree next = min.next;
 
@@ -304,12 +302,6 @@ public class BinomialHeap<E> implements Queue<E> {
 
         BinomialTree root2 = min.lastSubtree; // this is now the new head
         BinomialTree root1 = root;
-        if (root2 != null) {
-            // System.out.println("root2 is " + root2.reverseToString());
-        } else {
-            // System.out.println("root2 is " + "null");
-        }
-        // System.out.println("root1 is " + root1);
         root = null;
         min = null;
         size = 0;
@@ -324,7 +316,6 @@ public class BinomialHeap<E> implements Queue<E> {
         if (root == null) {
             return null;
         }
-        // System.out.println("min is" + min);
         return min.val;
     }
 
@@ -372,7 +363,6 @@ public class BinomialHeap<E> implements Queue<E> {
     }
 
     private void maybeSetMin(BinomialTree tree) {
-        // System.out.println("maybe setting min to " + tree + " which is? " +
         // tree.isChild + " a child");
         if (min == null || min.isChild) {
             min = tree;
@@ -389,12 +379,10 @@ public class BinomialHeap<E> implements Queue<E> {
         size += 1 << tree.depth;
         // see if we can add it anywhere
         while (root != null) {
-            // System.out.println("root.depth is " + root.depth + " for " + root);
             // case that it is less than root.depth
             // meaning we have smth like a 2-order BinomialTree as root
             // and we're inserting like a 1-order Binomial tree
             if (tree.depth < root.depth) {
-                // System.out.println("tree depth < root depth");
                 root.setPrev(tree);
                 root = tree;
                 maybeSetMin(tree);
@@ -404,7 +392,6 @@ public class BinomialHeap<E> implements Queue<E> {
             // case where it's equal to root's depth
             // meaning we alr have a 1-order binomial tree
             else if (tree.depth == root.depth) {
-                // System.out.println("tree depth equal root depth");
                 // store the next tree bc we'll have to compare w/ it
                 BinomialTree temp = root;
                 root = root.next;
@@ -413,9 +400,7 @@ public class BinomialHeap<E> implements Queue<E> {
                 tree = tree.mergeSameOrder(temp);
                 maybeSetMin(tree);
             } else if (tree.depth > root.depth) {
-                // System.out.println("tree depth > root depth");
                 if (root.next == null) {
-                    // System.out.println("root was null");
                     root.insertNext(tree);
                     tail = tree;
                     maybeSetMin(tree);
@@ -423,14 +408,11 @@ public class BinomialHeap<E> implements Queue<E> {
                 } else if (tail.depth < tree.depth) {
                     // since trees must be complete
                     // we can just set the tail to this tree and call it a day
-                    // System.out.println("tail depth of " + tail.depth + " for " + tail + " < " +
-                    // tree.depth);
                     tail.insertNext(tree);
                     tail = tree;
                     maybeSetMin(tree);
                     break;
                 } else if (tail.depth == tree.depth) {
-                    // System.out.println("tail depth equal tree depth");
                     BinomialTree temp = tail.prev;
                     tail.removeConnections(); // handles removing tail from tail.prev
                     temp.insertNext(tail.mergeSameOrder(tree));
@@ -446,7 +428,6 @@ public class BinomialHeap<E> implements Queue<E> {
                             cur = cur.next;
                         }
                         if (cur.next == null) {
-                            // System.out.println("inserting at end");
                             // made it to the end
                             tail.insertNext(tree);
                             tail = tree;
@@ -456,12 +437,10 @@ public class BinomialHeap<E> implements Queue<E> {
                         if (tree.depth < cur.next.depth) {
                             // just insert between
                             assert tree.depth != cur.depth;
-                            // System.out.println("inserting" + tree + "after " + cur);
                             cur.insertNext(tree);
                             maybeSetMin(tree);
                             break;
                         } else if (tree.depth == cur.next.depth) {
-                            // System.out.println("depth of " + tree + " matches " + cur.next);
                             BinomialTree temp = cur.removeNext();
                             temp.removeConnections();
 
@@ -503,9 +482,7 @@ public class BinomialHeap<E> implements Queue<E> {
                     temp = cur1;
                     cur1 = cur1.next;
 
-                    // System.out.println("case 1, temp is " + temp);
                     temp.removeConnections();
-                    // System.out.println("afterwards " + temp);
                 } else if (cur1.depth == cur2.depth) {
                     // cache cur1 and update cur1
                     temp = cur1;
@@ -521,17 +498,13 @@ public class BinomialHeap<E> implements Queue<E> {
                     temp2.removeConnections();
 
                     // merge
-                    // System.out.println("case 2, temp is " + temp + " and temp2 is " + temp2);
                     temp = temp.mergeSameOrder(temp2);
-                    // System.out.println("case 2, afterwards" + temp);
                 } else { // cur1.depth > cur2.depth
                     // cache the tree to merge and update cur1
                     temp = cur2;
                     cur2 = cur2.prev;
 
-                    // System.out.println("case 3, temp is " + temp);
                     temp.removeConnections();
-                    // System.out.println("case3 afterwards: " + temp);
                 }
             }
             // if only 1 of the roots still has smth, just merge that tree into the heap
@@ -540,24 +513,16 @@ public class BinomialHeap<E> implements Queue<E> {
                 temp = cur1;
                 cur1 = cur1.next;
 
-                // System.out.println("case 4" + temp);
                 temp.removeConnections();
-                // System.out.println("case 4 afterwards" + temp);
             } else {
                 // cache prev and clear connections
                 temp = cur2;
                 cur2 = cur2.prev;
-                // System.out.println("case 5" + temp + " depth: " + temp.depth);
                 temp.removeConnections();
-                // System.out.println("case 5 afterwards" + temp + " depth: " + temp.depth);
             }
 
-            // System.out.println("going to merge " + temp);
-            // System.out.println("it's depth is " + temp.depth);
             // merge into this heap
             mergeTree(temp);
-            // System.out.println("now, root is " + root);
-            // System.out.println("and tail is " + tail);
         }
     }
 
