@@ -5,6 +5,7 @@ import java.util.Collection;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
+import java.util.Objects;
 import java.util.Queue;
 import java.util.function.Predicate;
 
@@ -34,8 +35,8 @@ public class BinomialHeap<E> implements Queue<E> {
                 nextLevel.add(temp.firstSubtree);
             }
 
-            if (temp.sibling != null) {
-                curLevel.set(curLevelIdx, temp.sibling);
+            if (temp.next != null) {
+                curLevel.set(curLevelIdx, temp.next);
             } else {
                 ++curLevelIdx;
                 if (curLevelIdx == curLevel.size()) {
@@ -56,19 +57,103 @@ public class BinomialHeap<E> implements Queue<E> {
     private class BinomialTree {
         E val;
         BinomialTree firstSubtree;
-        BinomialTree sibling;
+        BinomialTree lastSubtree;
+        BinomialTree next;
+        BinomialTree prev;
         int depth;
+        boolean isChild;
 
         public BinomialTree(E val) {
             this.val = val;
         }
 
-        void addSubtree(BinomialTree subtree) {
-            subtree.sibling = firstSubtree;
+        public void addSubtree(BinomialTree subtree) {
+            subtree.next = firstSubtree;
+            if (firstSubtree != null) {
+                firstSubtree.prev = subtree;
+            } else {
+                // no existing firstsubtree, so no existing last subtree
+                lastSubtree = subtree;
+            }
             firstSubtree = subtree;
+            subtree.isChild = true;
         }
 
-        BinomialTree mergeSameOrder(BinomialTree o) {
+        public void removeConnections() {
+            // remove any links to this
+            if (next != null && next.prev != null && next.prev.equals(this)) {
+                next.prev = null;
+            }
+            if (prev != null && prev.next != null && prev.next.equals(this)) {
+                prev.next = null;
+            }
+
+            // remove any links from this
+            next = null;
+            prev = null;
+
+            // also say that it's not a child
+            isChild = false;
+        }
+
+        /**
+         * Removes the next node and returns that node
+         * 
+         * @return
+         */
+        public BinomialTree removeNext() {
+            BinomialTree ret = next;
+
+            // update links
+            next = ret.next;
+            if (ret.next != null) {
+                ret.next.prev = this;
+            }
+
+            // clear ret's connections and return it
+            ret.removeConnections();
+            return ret;
+        }
+
+        public void setPrev(BinomialTree n) {
+            if (prev == null) {
+                prev = n;
+                n.next = this;
+            } else {
+                // System.out.println("SetPrev called when prev wasn't null...");
+                // take care of the chance that there was smth at prev
+                BinomialTree temp = prev;
+                if (temp != null) {
+                    temp.next = n;
+                }
+                n.prev = temp;
+
+                // regular setting
+                prev = n;
+                n.next = this;
+            }
+        }
+
+        public void insertNext(BinomialTree next) {
+            if (this.next == null) {
+                this.next = next;
+                next.prev = this;
+            } else {
+                // known use case, so allow it
+                BinomialTree temp = this.next;
+                if (temp != null) {
+                    temp.prev = next;
+                }
+                next.next = temp;
+
+                // regular setting
+                this.next = next;
+                next.prev = this;
+
+            }
+        }
+
+        public BinomialTree mergeSameOrder(BinomialTree o) {
             if (compare(o.val, val) < 0) {
                 o.addSubtree(this);
                 ++o.depth;
@@ -85,9 +170,21 @@ public class BinomialHeap<E> implements Queue<E> {
             // link descendants first
             ret += firstSubtree == null ? "" : firstSubtree.toString();
 
-            // then add siblings
+            // then add nexts
             ret += "}";
-            ret += sibling == null ? "" : "," + sibling.toString();
+            ret += next == null ? "" : "," + next.toString();
+
+            return ret;
+        }
+
+        public String reverseToString() {
+            String ret = "{" + val + ":";
+            // link descendants first
+            ret += lastSubtree == null ? "" : lastSubtree.reverseToString();
+
+            // then add prevs
+            ret += "}";
+            ret += prev == null ? "" : "," + prev.reverseToString();
 
             return ret;
         }
@@ -101,10 +198,19 @@ public class BinomialHeap<E> implements Queue<E> {
             if (firstSubtree != null) {
                 ret |= firstSubtree.contains(o);
             }
-            if (sibling != null) {
-                ret |= sibling.contains(o);
+            if (next != null) {
+                ret |= next.contains(o);
             }
             return ret;
+        }
+
+        public boolean equals(BinomialTree o) {
+            return this.val.equals(o.val) && depth == o.depth;
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(val, depth);
         }
     }
 
@@ -175,41 +281,35 @@ public class BinomialHeap<E> implements Queue<E> {
         if (root == null) {
             return null;
         }
-        BinomialTree cur = root;
-        BinomialTree toAdd = null;
         E minVal = peek();
-        if (root.val.equals(minVal)) {
-            toAdd = root.firstSubtree;
-            root = root.sibling;
-            if (root == null) {
-                tail = null;
-            }
-        }
-        // else, iterate to find it
-        else {
-            while (!cur.sibling.val.equals(minVal)) {
-                cur = cur.sibling;
-            }
+        // System.out.println("min is " + min);
+        BinomialTree prev = min.prev;
+        BinomialTree next = min.next;
 
-            toAdd = cur.sibling; // this one equals minVal
-            cur.sibling = toAdd.sibling; // patch the tree
-            toAdd = toAdd.firstSubtree;// remove toAdd by taking only the subtrees of toAdd
+        // take care of root/tail cases
+        if (root.equals(min)) {
+            root = next;
+        }
+        if (tail.equals(min)) {
+            tail = prev;
         }
 
-        // reverse the order of toAdd to be in order of smallest to largest
-        BinomialTree prev = null;
-        cur = toAdd;
-        while (cur != null) {
-            // make cur point at prev
-            BinomialTree temp = cur.sibling;
-            cur.sibling = prev;
-
-            // advance pointers
-            prev = cur;
-            cur = temp;
+        // regular patching
+        if (prev != null) {
+            prev.next = next;
         }
-        BinomialTree root2 = prev; // this is now the new head
+        if (next != null) {
+            next.prev = null;
+        }
+
+        BinomialTree root2 = min.lastSubtree; // this is now the new head
         BinomialTree root1 = root;
+        if (root2 != null) {
+            // System.out.println("root2 is " + root2.reverseToString());
+        } else {
+            // System.out.println("root2 is " + "null");
+        }
+        // System.out.println("root1 is " + root1);
         root = null;
         min = null;
         size = 0;
@@ -224,6 +324,7 @@ public class BinomialHeap<E> implements Queue<E> {
         if (root == null) {
             return null;
         }
+        // System.out.println("min is" + min);
         return min.val;
     }
 
@@ -270,67 +371,102 @@ public class BinomialHeap<E> implements Queue<E> {
         mergeTree(toInsert);
     }
 
-    private void mergeTree(BinomialTree tree) {
-        if (min == null || compare(tree.val, min.val) < 0) {
+    private void maybeSetMin(BinomialTree tree) {
+        // System.out.println("maybe setting min to " + tree + " which is? " +
+        // tree.isChild + " a child");
+        if (min == null || min.isChild) {
             min = tree;
+        } else {
+            if (compare(tree.val, min.val) < 0) {
+                min = tree;
+            } else if (tree.val.equals(min.val) && tree.depth < min.depth) {
+                min = tree;
+            }
         }
+    }
 
+    private void mergeTree(BinomialTree tree) {
         size += 1 << tree.depth;
         // see if we can add it anywhere
         while (root != null) {
+            // System.out.println("root.depth is " + root.depth + " for " + root);
             // case that it is less than root.depth
             // meaning we have smth like a 2-order BinomialTree as root
             // and we're inserting like a 1-order Binomial tree
             if (tree.depth < root.depth) {
-                tree.sibling = root;
+                // System.out.println("tree depth < root depth");
+                root.setPrev(tree);
                 root = tree;
+                maybeSetMin(tree);
+
                 break;
             }
             // case where it's equal to root's depth
             // meaning we alr have a 1-order binomial tree
             else if (tree.depth == root.depth) {
+                // System.out.println("tree depth equal root depth");
                 // store the next tree bc we'll have to compare w/ it
-                BinomialTree temp = root.sibling;
-                root.sibling = null;
-                tree = tree.mergeSameOrder(root);
-                root = temp;
+                BinomialTree temp = root;
+                root = root.next;
+                temp.removeConnections();
+
+                tree = tree.mergeSameOrder(temp);
+                maybeSetMin(tree);
             } else if (tree.depth > root.depth) {
-                if (root.sibling == null) {
-                    root.sibling = tree;
+                // System.out.println("tree depth > root depth");
+                if (root.next == null) {
+                    // System.out.println("root was null");
+                    root.insertNext(tree);
                     tail = tree;
+                    maybeSetMin(tree);
                     break;
                 } else if (tail.depth < tree.depth) {
                     // since trees must be complete
                     // we can just set the tail to this tree and call it a day
-                    tail.sibling = tree;
+                    // System.out.println("tail depth of " + tail.depth + " for " + tail + " < " +
+                    // tree.depth);
+                    tail.insertNext(tree);
                     tail = tree;
+                    maybeSetMin(tree);
+                    break;
+                } else if (tail.depth == tree.depth) {
+                    // System.out.println("tail depth equal tree depth");
+                    BinomialTree temp = tail.prev;
+                    tail.removeConnections(); // handles removing tail from tail.prev
+                    temp.insertNext(tail.mergeSameOrder(tree));
+                    tail = temp.next;
+                    maybeSetMin(tail);
+
                     break;
                 } else {
                     // find the nodes that it lies in between
                     BinomialTree cur = root;
                     while (true) {
-                        while (cur.sibling != null && cur.sibling.depth < tree.depth) {
-                            cur = cur.sibling;
+                        while (cur.next != null && cur.next.depth < tree.depth) {
+                            cur = cur.next;
                         }
-                        if (cur.sibling == null) {
+                        if (cur.next == null) {
+                            // System.out.println("inserting at end");
                             // made it to the end
-                            cur.sibling = tree;
+                            tail.insertNext(tree);
                             tail = tree;
+                            maybeSetMin(tree);
                             break;
                         }
-                        if (tree.depth < cur.sibling.depth) {
+                        if (tree.depth < cur.next.depth) {
                             // just insert between
                             assert tree.depth != cur.depth;
-                            BinomialTree temp = cur.sibling;
-                            cur.sibling = tree;
-                            tree.sibling = temp;
+                            // System.out.println("inserting" + tree + "after " + cur);
+                            cur.insertNext(tree);
+                            maybeSetMin(tree);
                             break;
-                        } else if (tree.depth == cur.sibling.depth) {
-                            BinomialTree temp = cur.sibling;
-                            cur.sibling = temp.sibling;
-                            temp.sibling = null;
+                        } else if (tree.depth == cur.next.depth) {
+                            // System.out.println("depth of " + tree + " matches " + cur.next);
+                            BinomialTree temp = cur.removeNext();
+                            temp.removeConnections();
 
                             tree = tree.mergeSameOrder(temp);
+                            maybeSetMin(tree);
                         }
                     }
                     break;
@@ -344,65 +480,84 @@ public class BinomialHeap<E> implements Queue<E> {
             // the first place)
             root = tree;
             tail = tree;
+            maybeSetMin(tree);
         }
     }
 
     // assmes this.root has been cleared
     private void mergeWith(BinomialTree root1, BinomialTree root2) {
-        BinomialTree cur1 = root1;
-        BinomialTree cur2 = root2;
-        BinomialTree cur1Next = null;
-        BinomialTree cur2Next = null;
+        // the roots
+        BinomialTree cur1 = root1; // goes forward
+        BinomialTree cur2 = root2; // goes backwards
+
+        // for swapping, etc
+        BinomialTree temp = null;
+        BinomialTree temp2 = null;
 
         while (cur1 != null || cur2 != null) {
             if (cur1 != null && cur2 != null) {
-                BinomialTree temp = null;
+                temp = null;
                 // merge the two first
                 if (cur1.depth < cur2.depth) {
+                    // cache the tree to merge and update cur1
                     temp = cur1;
-                    cur1 = cur1.sibling;
-                    temp.sibling = null;
+                    cur1 = cur1.next;
+
+                    // System.out.println("case 1, temp is " + temp);
+                    temp.removeConnections();
+                    // System.out.println("afterwards " + temp);
                 } else if (cur1.depth == cur2.depth) {
+                    // cache cur1 and update cur1
                     temp = cur1;
-                    cur1 = cur1.sibling;
-                    temp.sibling = null;
+                    cur1 = cur1.next;
+                    // remove connections
+                    temp.removeConnections();
 
-                    cur2Next = cur2.sibling;
-                    cur2.sibling = null;
+                    // do same for cur2 (but use prev)
+                    // cache the tree to merge and update cur1
+                    temp2 = cur2;
+                    cur2 = cur2.prev;
+                    // remove connections
+                    temp2.removeConnections();
 
                     // merge
-                    temp = temp.mergeSameOrder(cur2);
-                    // update cur2
-                    cur2 = cur2Next;
+                    // System.out.println("case 2, temp is " + temp + " and temp2 is " + temp2);
+                    temp = temp.mergeSameOrder(temp2);
+                    // System.out.println("case 2, afterwards" + temp);
                 } else { // cur1.depth > cur2.depth
+                    // cache the tree to merge and update cur1
                     temp = cur2;
-                    cur2 = cur2.sibling;
-                    temp.sibling = null;
-                }
+                    cur2 = cur2.prev;
 
-                // put into heap
-                if (root == null) {
-                    // add tree
-                    root = temp;
-                    min = temp;
-                    size = 1 << temp.depth;
-                } else {
-                    // merge
-                    mergeTree(temp);
+                    // System.out.println("case 3, temp is " + temp);
+                    temp.removeConnections();
+                    // System.out.println("case3 afterwards: " + temp);
                 }
             }
             // if only 1 of the roots still has smth, just merge that tree into the heap
             else if (cur1 != null) {
-                cur1Next = cur1.sibling;
-                cur1.sibling = null;
-                mergeTree(cur1);
-                cur1 = cur1Next;
+                // cache next and clear connections
+                temp = cur1;
+                cur1 = cur1.next;
+
+                // System.out.println("case 4" + temp);
+                temp.removeConnections();
+                // System.out.println("case 4 afterwards" + temp);
             } else {
-                cur2Next = cur2.sibling;
-                cur2.sibling = null;
-                mergeTree(cur2);
-                cur2 = cur2Next;
+                // cache prev and clear connections
+                temp = cur2;
+                cur2 = cur2.prev;
+                // System.out.println("case 5" + temp + " depth: " + temp.depth);
+                temp.removeConnections();
+                // System.out.println("case 5 afterwards" + temp + " depth: " + temp.depth);
             }
+
+            // System.out.println("going to merge " + temp);
+            // System.out.println("it's depth is " + temp.depth);
+            // merge into this heap
+            mergeTree(temp);
+            // System.out.println("now, root is " + root);
+            // System.out.println("and tail is " + tail);
         }
     }
 

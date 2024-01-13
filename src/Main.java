@@ -249,18 +249,30 @@ public class Main {
 
         // BinomialHeap<Integer> bHeap = new BinomialHeap<>();
         // Random temp = new Random(2024);
-        // for (int i = 0; i < 1000; ++i) {
-        // bHeap.add(temp.nextInt(50));
+        // int n = 150;
+        // for (int i = 0; i < n; ++i) {
+        // int v = temp.nextInt(50);
+        // System.out.println(v);
+        // bHeap.add(v);
         // }
         // int prev = -1;
+        // System.out.println(bHeap);
+        // int times = 0;
         // while (!bHeap.isEmpty()) {
+        // ++times;
         // int val = bHeap.poll();
         // if (prev > val) {
         // System.out.println("NOPE!!!");
         // }
+        // System.out.println(val);
+        // System.out.println(bHeap);
         // prev = val;
         // }
+        // if (times == n) {
         // System.out.println("that worked!");
+        // } else {
+        // System.out.println("weird, only got " + times);
+        // }
 
     }
 }
