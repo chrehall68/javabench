@@ -3,6 +3,7 @@ import sort.QuickSort;
 import sort.Radix;
 import structures.AVL;
 import structures.ArrayHeap;
+import structures.ArrayQueue;
 import structures.BinomialHeap;
 import structures.JBLinkedList;
 import structures.SCHashMap;
@@ -17,6 +18,8 @@ import java.util.PriorityQueue;
 import java.util.Queue;
 import java.util.Random;
 import java.util.TreeMap;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.LinkedBlockingDeque;
 
 public class Main {
     public static void stressTest() {
@@ -251,9 +254,9 @@ public class Main {
                         System.out.println("NOOO!!");
                     }
                 }
-                // for (Integer i : toRemove) {
-                // scHashMap.remove(i);
-                // }
+                for (Integer i : toRemove) {
+                    scHashMap.remove(i);
+                }
                 scHashMap.clear();
             }
             endTime = System.nanoTime();
@@ -318,12 +321,73 @@ public class Main {
         }
     }
 
+    public static void qHelper(Queue<Integer> q, Integer[] arr, int attempts, String name) {
+        // run test
+        long startTime = System.nanoTime();
+        for (int attempt = 0; attempt < attempts; ++attempt) {
+            for (Integer i : arr) {
+                q.add(i);
+            }
+            for (int i = 0; i < arr.length; ++i) {
+                Integer val = q.poll();
+                if (!val.equals(arr[i])) {
+                    System.out.println("failed to retrieve in order");
+                    return;
+                }
+            }
+            for (Integer i : arr) {
+                q.add(i);
+                q.poll();
+            }
+            if (!q.isEmpty()) {
+                System.out.println("failed to poll all items");
+                return;
+            }
+            q.clear();
+        }
+        long endTime = System.nanoTime();
+        System.out.println("took " + (endTime - startTime) + "ns for " + name);
+        System.out.println("this averages to " + (double) (endTime - startTime) / (double) attempts + "ns");
+        System.out.println("or about " + (double) (endTime - startTime) / (double) attempts / 1e9 + "s");
+        System.out.println("------------");
+    }
+
+    public static void qTest() {
+        LinkedBlockingDeque<Integer> realQueue = new LinkedBlockingDeque<>();
+        ArrayBlockingQueue<Integer> realABQueue = new ArrayBlockingQueue<>((int) 1e6);
+        ArrayQueue<Integer> arrayQueue = new ArrayQueue<>((int) 1e6);
+
+        int[] tests = { (int) 1e3, (int) 1e5, (int) 1e6, };
+        int n = 50; // do tests and average
+        Random random = new Random(2024);
+        int max = (int) 1e8;
+        int min = (int) -1e8;
+
+        // test
+        for (int test : tests) {
+            System.out.println("===============");
+            System.out.println("testing for " + test);
+            Integer[] arr = new Integer[test];
+
+            // initialize array
+            for (int i = 0; i < test; ++i) {
+                arr[i] = random.nextInt(max - min) + min;
+            }
+
+            qHelper(arrayQueue, arr, n, "array queue");
+            qHelper(realQueue, arr, n, "real linked blocking queue");
+            qHelper(realABQueue, arr, n, "real array queue");
+
+        }
+
+    }
+
     public static void main(String[] args) {
         // stressTest();
         // llTest();
         // treeTest();
         // pqTest();
-        hashmapTest();
-
+        // hashmapTest();
+        qTest();
     }
 }

@@ -8,6 +8,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 
+@SuppressWarnings("unchecked")
 public class SCHashMap<K, V> implements Map<K, V> {
     private class Node implements Entry<K, V> {
         private K key;
