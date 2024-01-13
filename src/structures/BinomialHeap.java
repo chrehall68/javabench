@@ -176,18 +176,6 @@ public class BinomialHeap<E> implements Queue<E> {
             return ret;
         }
 
-        public String reverseToString() {
-            String ret = "{" + val + ":";
-            // link descendants first
-            ret += lastSubtree == null ? "" : lastSubtree.reverseToString();
-
-            // then add prevs
-            ret += "}";
-            ret += prev == null ? "" : "," + prev.reverseToString();
-
-            return ret;
-        }
-
         public boolean contains(Object o) {
             if (o.equals(val)) {
                 return true;
