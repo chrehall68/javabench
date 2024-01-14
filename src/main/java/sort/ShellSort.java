@@ -44,4 +44,25 @@ public class ShellSort {
             }
         }
     }
+    public static void sort(double[] arr) {
+        for (int k = Math.max(arr.length / 3, 1); k > 0; --k) {
+            bubbleSort(arr, k);
+        }
+    }
+
+    private static void bubbleSort(double[] arr, int k) {
+        for (int i = arr.length - k; i > -1; --i) {
+            for (int j = i + k; j < arr.length; j += k) {
+                // already sorted
+                if (arr[j - k] <= arr[j]) {
+                    break;
+                } else {
+                    // swap
+                    double temp = arr[j - k];
+                    arr[j - k] = arr[j];
+                    arr[j] = temp;
+                }
+            }
+        }
+    }
 }
