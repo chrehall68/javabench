@@ -1,6 +1,7 @@
 import sort.MergeSort;
 import sort.QuickSort;
 import sort.Radix;
+import sort.ShellSort;
 import structures.AVL;
 import structures.ArrayHeap;
 import structures.ArrayQueue;
@@ -25,7 +26,7 @@ public class Main {
         int[] tests = { 10, (int) 1e5, (int) 1e8 };
         int min = -(int) 1e8;
         int max = (int) 1e8;
-        int[] bases = { 2, 7, 0, -1, -2 };
+        int[] bases = { 2, 7, 0, -1, -2, -3 };
         ArrayList<Random> randoms = new ArrayList<>();
         for (int i = 0; i < bases.length; ++i) {
             randoms.add(new Random(2024));
@@ -50,6 +51,8 @@ public class Main {
                     MergeSort.sort(arr);
                 } else if (bases[baseIdx] == -1) {
                     QuickSort.sort(arr);
+                } else if (bases[baseIdx] == -2) {
+                    ShellSort.sort(arr);
                 } else {
                     Arrays.sort(arr);
                 }
@@ -382,15 +385,16 @@ public class Main {
     }
 
     public static void main(String[] args) {
-        // stressTest();
+        stressTest();
         // llTest();
         // treeTest();
         // pqTest();
         // hashmapTest();
         // qTest();
 
-        Integer[] arr = { 6, 3, 8, 1, 9, 4, 8 };
-        ArrayHeap.heapSort(arr);
-        System.out.println(Arrays.toString(arr));
+        // Integer[] arr = { 6, 3, 8, 1, 9, 4, 8 };
+        // System.out.println(Arrays.toString(arr));
+        // ShellSort.sort(arr);
+        // System.out.println(Arrays.toString(arr));
     }
 }
