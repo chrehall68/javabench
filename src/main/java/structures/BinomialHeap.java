@@ -13,9 +13,14 @@ public class BinomialHeap<E> implements Queue<E> {
     private BinomialTree root;
     private BinomialTree tail;
     private BinomialTree min;
+
+    /**
+     * Creates a min heap by default
+     */
     public BinomialHeap() {
 
     }
+
     public BinomialHeap(Comparator<? super E> comparator) {
         this.comparator = comparator;
     }

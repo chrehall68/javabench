@@ -14,7 +14,7 @@ class MergeSortTest {
 
         Integer[] mergeSortedArr = new MergeSort().sort(Arrays.copyOf(arr, arr.length));
         Arrays.sort(arr);
-        assertArrayEquals(mergeSortedArr, arr);
+        assertArrayEquals(arr, mergeSortedArr);
     }
 
     @Test
@@ -22,7 +22,7 @@ class MergeSortTest {
         int[] arr = ArrayGenerator.generateIntArray();
         int[] mergeSortedArr = new MergeSort().sort(Arrays.copyOf(arr, arr.length));
         Arrays.sort(arr);
-        assertArrayEquals(mergeSortedArr, arr);
+        assertArrayEquals(arr, mergeSortedArr);
     }
 
     @Test
@@ -30,6 +30,6 @@ class MergeSortTest {
         double[] arr = ArrayGenerator.generateDoubleArray();
         double[] mergeSortedArr = new MergeSort().sort(Arrays.copyOf(arr, arr.length));
         Arrays.sort(arr);
-        assertArrayEquals(mergeSortedArr, arr);
+        assertArrayEquals(arr, mergeSortedArr);
     }
 }

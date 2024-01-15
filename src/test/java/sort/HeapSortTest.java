@@ -16,6 +16,6 @@ public class HeapSortTest {
 
         assertEquals(arr, ArrayHeap.heapSort(arr));
         Object[] sorted = Arrays.stream(Arrays.copyOf(arr, arr.length)).sorted().toArray();
-        assertArrayEquals(arr, sorted);
+        assertArrayEquals(sorted, arr);
     }
 }

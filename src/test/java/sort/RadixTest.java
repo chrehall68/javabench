@@ -7,6 +7,7 @@ import resources.ArrayGenerator;
 import java.util.Arrays;
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class RadixTest {
     @ParameterizedTest
@@ -14,11 +15,13 @@ class RadixTest {
     void testSortInt(int base) {
         int[] arr = ArrayGenerator.generateIntArray();
 
-        new Radix().sort(arr, base);
+        int[] sorted = new Radix().sort(arr, base);
+
+        assertEquals(arr, sorted);  // make sure in-place
 
         // make sure it is sorted
         int[] arraySorted = Arrays.copyOf(arr, arr.length);
         Arrays.sort(arraySorted);
-        assertArrayEquals(arraySorted, arr);
+        assertArrayEquals(arraySorted, sorted);
     }
 }

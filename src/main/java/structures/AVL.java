@@ -281,13 +281,13 @@ public class AVL<K extends Comparable<K>, V> implements Map<K, V> {
     @Override
     public V put(K key, V val) {
         if (root == null) {
+            ++size;
             this.root = new Node(key, val);
-            return val;
         } else {
             insert(root, key, val);
             checkRotate(root);
-            return val;
         }
+        return val;
     }
 
     @Override

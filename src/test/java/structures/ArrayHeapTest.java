@@ -37,7 +37,7 @@ class ArrayHeapTest {
         ArrayHeap<Integer> arrayHeap = new ArrayHeap<>();
         for (int i = 0; i < arr.length; ++i) {
             arrayHeap.add(arr[i]);
-            assertEquals(arrayHeap.size(), i + 1);
+            assertEquals(i + 1, arrayHeap.size());
         }
     }
 
