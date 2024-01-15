@@ -1,40 +1,10 @@
 package structures;
 
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.Iterator;
-import java.util.NoSuchElementException;
-import java.util.Queue;
+import java.util.*;
 import java.util.function.Predicate;
 
 @SuppressWarnings("unchecked")
 public class ArrayHeap<E> implements Queue<E> {
-    private class HeapIterator implements Iterator<E> {
-        int idx;
-        ArrayHeap<E> h;
-
-        public HeapIterator(ArrayHeap<E> h) {
-            this.h = h;
-            idx = 0;
-        }
-
-        @Override
-        public E next() {
-            return h.heap[idx++];
-        }
-
-        @Override
-        public boolean hasNext() {
-            return idx < h.last;
-        }
-
-        @Override
-        public void remove() {
-            h.remove(h.heap[--idx]);
-        }
-    }
-
     // ==============================
     // Constructor/Attribute Section
     // ==============================
@@ -43,7 +13,6 @@ public class ArrayHeap<E> implements Queue<E> {
     private int last;
     private Comparator<? super E> comparator;
     private int height;
-
     public ArrayHeap() {
         this(INITIAL_SIZE);
     }
@@ -73,6 +42,25 @@ public class ArrayHeap<E> implements Queue<E> {
         last = arr.length;
     }
 
+    /**
+     * Sorts arr in-place in increasing order
+     *
+     * @param <E> - type of the array
+     * @param arr - the array to be sorted, in-place
+     */
+    public static <E> void heapSort(E[] arr) {
+        ArrayHeap<E> h = new ArrayHeap<E>(arr);
+        // first, heapify
+        for (int i = 0; i < arr.length; ++i) {
+            h.heapifyDown(i);
+        }
+
+        // next, extract maxes and put them at the end
+        for (int i = arr.length - 1; i > -1; --i) {
+            arr[i] = h.poll();
+        }
+    }
+
     // ==============================
     // Misc Section
     // ==============================
@@ -91,25 +79,6 @@ public class ArrayHeap<E> implements Queue<E> {
             ret[i] = (T) heap[i];
         }
         return ret;
-    }
-
-    /**
-     * Sorts arr in-place in increasing order
-     * 
-     * @param <E> - type of the array
-     * @param arr - the array to be sorted, in-place
-     */
-    public static <E> void heapSort(E[] arr) {
-        ArrayHeap<E> h = new ArrayHeap<E>((Object[]) arr);
-        // first, heapify
-        for (int i = 0; i < arr.length; ++i) {
-            h.heapifyDown(i);
-        }
-
-        // next, extract maxes and put them at the end
-        for (int i = arr.length - 1; i > -1; --i) {
-            arr[i] = h.poll();
-        }
     }
 
     @Override
@@ -284,12 +253,9 @@ public class ArrayHeap<E> implements Queue<E> {
         return add(e);
     }
 
-    // ==============================
-    // Internal Section
-    // ==============================
     /**
      * Heapify starting from idx and going to children
-     * 
+     *
      * @param idx
      */
     private void heapifyDown(int idx) {
@@ -324,10 +290,14 @@ public class ArrayHeap<E> implements Queue<E> {
         }
     }
 
+    // ==============================
+    // Internal Section
+    // ==============================
+
     /**
      * Heapify starting from idx and going up to parents
      * Should be used after insertions
-     * 
+     *
      * @param idx - the idx of the recently inserted node
      */
     private void heapifyUp(int idx) {
@@ -379,5 +349,30 @@ public class ArrayHeap<E> implements Queue<E> {
     private void resizeHeap() {
         // add 1 layer of height
         heap = Arrays.copyOf(heap, (1 << ++height) - 1);
+    }
+
+    private class HeapIterator implements Iterator<E> {
+        int idx;
+        ArrayHeap<E> h;
+
+        public HeapIterator(ArrayHeap<E> h) {
+            this.h = h;
+            idx = 0;
+        }
+
+        @Override
+        public E next() {
+            return h.heap[idx++];
+        }
+
+        @Override
+        public boolean hasNext() {
+            return idx < h.last;
+        }
+
+        @Override
+        public void remove() {
+            h.remove(h.heap[--idx]);
+        }
     }
 }

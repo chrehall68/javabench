@@ -1,206 +1,10 @@
 package structures;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.Iterator;
-import java.util.NoSuchElementException;
-import java.util.Objects;
-import java.util.Queue;
+import java.util.*;
 import java.util.function.Predicate;
 
 @SuppressWarnings("unchecked")
 public class BinomialHeap<E> implements Queue<E> {
-    private class BinomialHeapIterator implements Iterator<E> {
-        ArrayList<BinomialTree> curLevel;
-        ArrayList<BinomialTree> nextLevel;
-        int curLevelIdx = 0;
-
-        public BinomialHeapIterator() {
-            curLevel = new ArrayList<>();
-            nextLevel = new ArrayList<>();
-            if (root != null) {
-                curLevel.add(root);
-            }
-        }
-
-        @Override
-        public E next() {
-            if (!hasNext()) {
-                throw new NoSuchElementException();
-            }
-            BinomialTree temp = curLevel.get(curLevelIdx);
-
-            if (temp.firstSubtree != null) {
-                nextLevel.add(temp.firstSubtree);
-            }
-
-            if (temp.next != null) {
-                curLevel.set(curLevelIdx, temp.next);
-            } else {
-                ++curLevelIdx;
-                if (curLevelIdx == curLevel.size()) {
-                    curLevel = nextLevel;
-                    nextLevel = new ArrayList<>();
-                    curLevelIdx = 0;
-                }
-            }
-            return temp.val;
-        }
-
-        @Override
-        public boolean hasNext() {
-            return curLevelIdx < curLevel.size();
-        }
-    }
-
-    private class BinomialTree {
-        E val;
-        BinomialTree firstSubtree;
-        BinomialTree lastSubtree;
-        BinomialTree next;
-        BinomialTree prev;
-        int depth;
-        boolean isChild;
-
-        public BinomialTree(E val) {
-            this.val = val;
-        }
-
-        public void addSubtree(BinomialTree subtree) {
-            subtree.next = firstSubtree;
-            if (firstSubtree != null) {
-                firstSubtree.prev = subtree;
-            } else {
-                // no existing firstsubtree, so no existing last subtree
-                lastSubtree = subtree;
-            }
-            firstSubtree = subtree;
-            subtree.isChild = true;
-        }
-
-        public void removeConnections() {
-            // remove any links to this
-            if (next != null && next.prev != null && next.prev.equals(this)) {
-                next.prev = null;
-            }
-            if (prev != null && prev.next != null && prev.next.equals(this)) {
-                prev.next = null;
-            }
-
-            // remove any links from this
-            next = null;
-            prev = null;
-
-            // also say that it's not a child
-            isChild = false;
-        }
-
-        /**
-         * Removes the next node and returns that node
-         * 
-         * @return
-         */
-        public BinomialTree removeNext() {
-            BinomialTree ret = next;
-
-            // update links
-            next = ret.next;
-            if (ret.next != null) {
-                ret.next.prev = this;
-            }
-
-            // clear ret's connections and return it
-            ret.removeConnections();
-            return ret;
-        }
-
-        public void setPrev(BinomialTree n) {
-            if (prev == null) {
-                prev = n;
-                n.next = this;
-            } else {
-                // take care of the chance that there was smth at prev
-                BinomialTree temp = prev;
-                if (temp != null) {
-                    temp.next = n;
-                }
-                n.prev = temp;
-
-                // regular setting
-                prev = n;
-                n.next = this;
-            }
-        }
-
-        public void insertNext(BinomialTree next) {
-            if (this.next == null) {
-                this.next = next;
-                next.prev = this;
-            } else {
-                // known use case, so allow it
-                BinomialTree temp = this.next;
-                if (temp != null) {
-                    temp.prev = next;
-                }
-                next.next = temp;
-
-                // regular setting
-                this.next = next;
-                next.prev = this;
-
-            }
-        }
-
-        public BinomialTree mergeSameOrder(BinomialTree o) {
-            if (compare(o.val, val) < 0) {
-                o.addSubtree(this);
-                ++o.depth;
-                return o;
-            } else {
-                addSubtree(o);
-                ++depth;
-                return this;
-            }
-        }
-
-        public String toString() {
-            String ret = "{" + val + ":";
-            // link descendants first
-            ret += firstSubtree == null ? "" : firstSubtree.toString();
-
-            // then add nexts
-            ret += "}";
-            ret += next == null ? "" : "," + next.toString();
-
-            return ret;
-        }
-
-        public boolean contains(Object o) {
-            if (o.equals(val)) {
-                return true;
-            }
-
-            boolean ret = false;
-            if (firstSubtree != null) {
-                ret |= firstSubtree.contains(o);
-            }
-            if (next != null) {
-                ret |= next.contains(o);
-            }
-            return ret;
-        }
-
-        public boolean equals(BinomialTree o) {
-            return this.val.equals(o.val) && depth == o.depth;
-        }
-
-        @Override
-        public int hashCode() {
-            return Objects.hash(val, depth);
-        }
-    }
-
     // ==============================
     // Attributes/Constructor Section
     // ==============================
@@ -209,11 +13,9 @@ public class BinomialHeap<E> implements Queue<E> {
     private BinomialTree root;
     private BinomialTree tail;
     private BinomialTree min;
-
     public BinomialHeap() {
 
     }
-
     public BinomialHeap(Comparator<? super E> comparator) {
         this.comparator = comparator;
     }
@@ -562,5 +364,195 @@ public class BinomialHeap<E> implements Queue<E> {
     // ==============================
     private int compare(E lhs, E rhs) {
         return comparator == null ? ((Comparable<E>) lhs).compareTo(rhs) : comparator.compare(lhs, rhs);
+    }
+
+    private class BinomialHeapIterator implements Iterator<E> {
+        ArrayList<BinomialTree> curLevel;
+        ArrayList<BinomialTree> nextLevel;
+        int curLevelIdx = 0;
+
+        public BinomialHeapIterator() {
+            curLevel = new ArrayList<>();
+            nextLevel = new ArrayList<>();
+            if (root != null) {
+                curLevel.add(root);
+            }
+        }
+
+        @Override
+        public E next() {
+            if (!hasNext()) {
+                throw new NoSuchElementException();
+            }
+            BinomialTree temp = curLevel.get(curLevelIdx);
+
+            if (temp.firstSubtree != null) {
+                nextLevel.add(temp.firstSubtree);
+            }
+
+            if (temp.next != null) {
+                curLevel.set(curLevelIdx, temp.next);
+            } else {
+                ++curLevelIdx;
+                if (curLevelIdx == curLevel.size()) {
+                    curLevel = nextLevel;
+                    nextLevel = new ArrayList<>();
+                    curLevelIdx = 0;
+                }
+            }
+            return temp.val;
+        }
+
+        @Override
+        public boolean hasNext() {
+            return curLevelIdx < curLevel.size();
+        }
+    }
+
+    private class BinomialTree {
+        E val;
+        BinomialTree firstSubtree;
+        BinomialTree lastSubtree;
+        BinomialTree next;
+        BinomialTree prev;
+        int depth;
+        boolean isChild;
+
+        public BinomialTree(E val) {
+            this.val = val;
+        }
+
+        public void addSubtree(BinomialTree subtree) {
+            subtree.next = firstSubtree;
+            if (firstSubtree != null) {
+                firstSubtree.prev = subtree;
+            } else {
+                // no existing firstsubtree, so no existing last subtree
+                lastSubtree = subtree;
+            }
+            firstSubtree = subtree;
+            subtree.isChild = true;
+        }
+
+        public void removeConnections() {
+            // remove any links to this
+            if (next != null && next.prev != null && next.prev.equals(this)) {
+                next.prev = null;
+            }
+            if (prev != null && prev.next != null && prev.next.equals(this)) {
+                prev.next = null;
+            }
+
+            // remove any links from this
+            next = null;
+            prev = null;
+
+            // also say that it's not a child
+            isChild = false;
+        }
+
+        /**
+         * Removes the next node and returns that node
+         *
+         * @return
+         */
+        public BinomialTree removeNext() {
+            BinomialTree ret = next;
+
+            // update links
+            next = ret.next;
+            if (ret.next != null) {
+                ret.next.prev = this;
+            }
+
+            // clear ret's connections and return it
+            ret.removeConnections();
+            return ret;
+        }
+
+        public void setPrev(BinomialTree n) {
+            if (prev == null) {
+                prev = n;
+                n.next = this;
+            } else {
+                // take care of the chance that there was smth at prev
+                BinomialTree temp = prev;
+                if (temp != null) {
+                    temp.next = n;
+                }
+                n.prev = temp;
+
+                // regular setting
+                prev = n;
+                n.next = this;
+            }
+        }
+
+        public void insertNext(BinomialTree next) {
+            if (this.next == null) {
+                this.next = next;
+                next.prev = this;
+            } else {
+                // known use case, so allow it
+                BinomialTree temp = this.next;
+                if (temp != null) {
+                    temp.prev = next;
+                }
+                next.next = temp;
+
+                // regular setting
+                this.next = next;
+                next.prev = this;
+
+            }
+        }
+
+        public BinomialTree mergeSameOrder(BinomialTree o) {
+            if (compare(o.val, val) < 0) {
+                o.addSubtree(this);
+                ++o.depth;
+                return o;
+            } else {
+                addSubtree(o);
+                ++depth;
+                return this;
+            }
+        }
+
+        public String toString() {
+            String ret = "{" + val + ":";
+            // link descendants first
+            ret += firstSubtree == null ? "" : firstSubtree.toString();
+
+            // then add nexts
+            ret += "}";
+            ret += next == null ? "" : "," + next;
+
+            return ret;
+        }
+
+        public boolean contains(Object o) {
+            if (o.equals(val)) {
+                return true;
+            }
+
+            boolean ret = false;
+            if (firstSubtree != null) {
+                ret |= firstSubtree.contains(o);
+            }
+            if (next != null) {
+                ret |= next.contains(o);
+            }
+            return ret;
+        }
+
+        public boolean equals(BinomialTree o) {
+            return this.val.equals(o.val) && depth == o.depth;
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(val, depth);
+        }
     }
 }

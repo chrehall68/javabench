@@ -7,30 +7,11 @@ import java.util.Queue;
 
 @SuppressWarnings("unchecked")
 public class ArrayQueue<E> implements Queue<E> {
-    private class ArrayQueueIterator implements Iterator<E> {
-        private int cur;
-
-        public ArrayQueueIterator() {
-            cur = first;
-        }
-
-        @Override
-        public boolean hasNext() {
-            return cur != last;
-        }
-
-        @Override
-        public E next() {
-            return (E) arr[(cur++) % arr.length];
-        }
-    }
-
+    private static final int INITIAL_SIZE = 16;
     private Object[] arr;
     private int first;
     private int last;
     private int size;
-    private static final int INITIAL_SIZE = 16;
-
     public ArrayQueue() {
         this(INITIAL_SIZE);
     }
@@ -226,6 +207,24 @@ public class ArrayQueue<E> implements Queue<E> {
     @Override
     public boolean offer(E e) {
         return add(e);
+    }
+
+    private class ArrayQueueIterator implements Iterator<E> {
+        private int cur;
+
+        public ArrayQueueIterator() {
+            cur = first;
+        }
+
+        @Override
+        public boolean hasNext() {
+            return cur != last;
+        }
+
+        @Override
+        public E next() {
+            return (E) arr[(cur++) % arr.length];
+        }
     }
 
 }

@@ -1,18 +1,17 @@
 package sort;
 
-public class QuickSort {
-    public static int[] sort(int[] arr) {
+public class QuickSort implements ISorter {
+    public int[] sort(int[] arr) {
         quickSort(arr, 0, arr.length - 1);
         return arr;
     }
 
     /**
-     * 
-     * @param arr - array to quicksort in place
+     * @param arr  - array to quicksort in place
      * @param low  inclusive
      * @param high inclusive
      */
-    private static void quickSort(int[] arr, int low, int high) {
+    private void quickSort(int[] arr, int low, int high) {
         if (low >= high) {
             return;
         }
@@ -22,15 +21,14 @@ public class QuickSort {
     }
 
     /**
-     * 
-     * @param arr - array to partition in place
+     * @param arr  - array to partition in place
      * @param low  inclusive
      * @param high inclusive
      * @return int[] - the indexes; the first item is the last index of an element
-     *         <= partition; the second
-     *         item is the first index of an element >= partition
+     * <= partition; the second
+     * item is the first index of an element >= partition
      */
-    private static int[] partition(int[] arr, int low, int high) {
+    private int[] partition(int[] arr, int low, int high) {
         int pivot = arr[low + (high - low) / 2];
 
         int lowIdx = low;
@@ -61,22 +59,21 @@ public class QuickSort {
             }
         }
 
-        return new int[]{ lowIdx, highIdx };
+        return new int[]{lowIdx, highIdx};
     }
 
 
-    public static double[] sort(double[] arr) {
+    public double[] sort(double[] arr) {
         quickSort(arr, 0, arr.length - 1);
         return arr;
     }
 
     /**
-     *
-     * @param arr - array to quicksort in place
+     * @param arr  - array to quicksort in place
      * @param low  inclusive
      * @param high inclusive
      */
-    private static void quickSort(double[] arr, int low, int high) {
+    private void quickSort(double[] arr, int low, int high) {
         if (low >= high) {
             return;
         }
@@ -86,15 +83,14 @@ public class QuickSort {
     }
 
     /**
-     *
-     * @param arr - array to partition in place
+     * @param arr  - array to partition in place
      * @param low  inclusive
      * @param high inclusive
      * @return int[] - the indexes; the first item is the last index of an element
-     *         <= partition; the second
-     *         item is the first index of an element >= partition
+     * <= partition; the second
+     * item is the first index of an element >= partition
      */
-    private static int[] partition(double[] arr, int low, int high) {
+    private int[] partition(double[] arr, int low, int high) {
         double pivot = arr[low + (high - low) / 2];
 
         int lowIdx = low;
@@ -125,22 +121,21 @@ public class QuickSort {
             }
         }
 
-        return new int[]{ lowIdx, highIdx };
+        return new int[]{lowIdx, highIdx};
     }
 
 
-    public static <E extends Comparable<E>> E[] sort(E[] arr) {
+    public <E extends Comparable<E>> E[] sort(E[] arr) {
         quickSort(arr, 0, arr.length - 1);
         return arr;
     }
 
     /**
-     *
-     * @param arr - array to quicksort in place
+     * @param arr  - array to quicksort in place
      * @param low  inclusive
      * @param high inclusive
      */
-    private static <E extends Comparable<E>> void quickSort(E[] arr, int low, int high) {
+    private <E extends Comparable<E>> void quickSort(E[] arr, int low, int high) {
         if (low >= high) {
             return;
         }
@@ -150,15 +145,14 @@ public class QuickSort {
     }
 
     /**
-     *
-     * @param arr - array to partition in place
+     * @param arr  - array to partition in place
      * @param low  inclusive
      * @param high inclusive
      * @return int[] - the indexes; the first item is the last index of an element
-     *         <= partition; the second
-     *         item is the first index of an element >= partition
+     * <= partition; the second
+     * item is the first index of an element >= partition
      */
-    private static <E extends Comparable<E>> int[] partition(E[] arr, int low, int high) {
+    private <E extends Comparable<E>> int[] partition(E[] arr, int low, int high) {
         E pivot = arr[low + (high - low) / 2];
 
         int lowIdx = low;
@@ -189,6 +183,6 @@ public class QuickSort {
             }
         }
 
-        return new int[]{ lowIdx, highIdx };
+        return new int[]{lowIdx, highIdx};
     }
 }

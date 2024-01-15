@@ -2,31 +2,18 @@ import sort.MergeSort;
 import sort.QuickSort;
 import sort.Radix;
 import sort.ShellSort;
-import structures.AVL;
-import structures.ArrayHeap;
-import structures.ArrayQueue;
-import structures.BinomialHeap;
-import structures.JBLinkedList;
-import structures.SCHashMap;
+import structures.*;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.LinkedHashMap;
-import java.util.LinkedList;
-import java.util.PriorityQueue;
-import java.util.Queue;
-import java.util.Random;
-import java.util.TreeMap;
+import java.util.*;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.LinkedBlockingDeque;
 
 public class Main {
     public static void stressTest() {
-        int[] tests = { 10, (int) 1e5, (int) 1e8 };
+        int[] tests = {10, (int) 1e5, (int) 1e8};
         int min = -(int) 1e8;
         int max = (int) 1e8;
-        int[] bases = { 2, 7, 0, -1, -2, -3 };
+        int[] bases = {2, 7, 0, -1, -2, -3};
         ArrayList<Random> randoms = new ArrayList<>();
         for (int i = 0; i < bases.length; ++i) {
             randoms.add(new Random(2024));
@@ -46,13 +33,13 @@ public class Main {
                 // run test
                 long startTime = System.nanoTime();
                 if (bases[baseIdx] > 1) {
-                    Radix.sort(arr, bases[baseIdx]);
+                    new Radix().sort(arr, bases[baseIdx]);
                 } else if (bases[baseIdx] == 0) {
-                    MergeSort.sort(arr);
+                    new MergeSort().sort(arr);
                 } else if (bases[baseIdx] == -1) {
-                    QuickSort.sort(arr);
+                    new QuickSort().sort(arr);
                 } else if (bases[baseIdx] == -2) {
-                    ShellSort.sort(arr);
+                    new ShellSort().sort(arr);
                 } else {
                     Arrays.sort(arr);
                 }
@@ -68,7 +55,7 @@ public class Main {
         LinkedList<Integer> realLinkedList = new LinkedList<>();
         JBLinkedList<Integer> jbLinkedList = new JBLinkedList<>();
 
-        int[] tests = { (int) 1e3, (int) 1e4 };
+        int[] tests = {(int) 1e3, (int) 1e4};
         int n = 50; // do tests and average
         Random random = new Random(2024);
         int max = (int) 1e8;
@@ -92,9 +79,7 @@ public class Main {
             // run test
             long startTime = System.nanoTime();
             for (int attempt = 0; attempt < n; ++attempt) {
-                for (Integer i : arr) {
-                    realLinkedList.add(i);
-                }
+                Collections.addAll(realLinkedList, arr);
                 for (Integer i : toRemove) {
                     realLinkedList.remove(i);
                 }
@@ -109,9 +94,7 @@ public class Main {
             // run test
             startTime = System.nanoTime();
             for (int attempt = 0; attempt < n; ++attempt) {
-                for (Integer i : arr) {
-                    jbLinkedList.add(i);
-                }
+                Collections.addAll(jbLinkedList, arr);
                 for (Integer i : toRemove) {
                     jbLinkedList.remove(i);
                 }
@@ -128,7 +111,7 @@ public class Main {
         TreeMap<Integer, Integer> realTreeMap = new TreeMap<>();
         AVL<Integer, Integer> avl = new AVL<>();
 
-        int[] tests = { (int) 1e3, (int) 1e5, (int) 1e6 };
+        int[] tests = {(int) 1e3, (int) 1e5, (int) 1e6};
         int n = 10; // do 10 tests and average
         Random random = new Random(2024);
         int max = (int) 1e8;
@@ -198,7 +181,7 @@ public class Main {
         LinkedHashMap<Integer, Integer> realHM = new LinkedHashMap<>();
         SCHashMap<Integer, Integer> scHashMap = new SCHashMap<>();
 
-        int[] tests = { (int) 1e3, (int) 1e5, (int) 1e6 };
+        int[] tests = {(int) 1e3, (int) 1e5, (int) 1e6};
         int n = 25; // do 10 tests and average
         Random random = new Random(2024);
         int max = (int) 1e8;
@@ -272,9 +255,7 @@ public class Main {
         // run test
         long startTime = System.nanoTime();
         for (int attempt = 0; attempt < attempts; ++attempt) {
-            for (Integer i : arr) {
-                q.add(i);
-            }
+            Collections.addAll(q, arr);
             Integer temp = Integer.MIN_VALUE;
             for (int i = 0; i < arr.length; ++i) {
                 Integer val = q.poll();
@@ -299,7 +280,7 @@ public class Main {
         ArrayHeap<Integer> arrayHeap = new ArrayHeap<>((int) 1e6, Comparator.reverseOrder());
         BinomialHeap<Integer> bHeap = new BinomialHeap<>();
 
-        int[] tests = { (int) 1e3, (int) 1e5, (int) 1e6, };
+        int[] tests = {(int) 1e3, (int) 1e5, (int) 1e6,};
         int n = 20; // do 20 tests and average
         Random random = new Random(2024);
         int max = (int) 1e8;
@@ -327,9 +308,7 @@ public class Main {
         // run test
         long startTime = System.nanoTime();
         for (int attempt = 0; attempt < attempts; ++attempt) {
-            for (Integer i : arr) {
-                q.add(i);
-            }
+            Collections.addAll(q, arr);
             for (int i = 0; i < arr.length; ++i) {
                 Integer val = q.poll();
                 if (!val.equals(arr[i])) {
@@ -359,7 +338,7 @@ public class Main {
         ArrayBlockingQueue<Integer> realABQueue = new ArrayBlockingQueue<>((int) 1e6);
         ArrayQueue<Integer> arrayQueue = new ArrayQueue<>((int) 1e6);
 
-        int[] tests = { (int) 1e3, (int) 1e5, (int) 1e6, };
+        int[] tests = {(int) 1e3, (int) 1e5, (int) 1e6,};
         int n = 50; // do tests and average
         Random random = new Random(2024);
         int max = (int) 1e8;

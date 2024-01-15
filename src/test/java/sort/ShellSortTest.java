@@ -1,16 +1,18 @@
 package sort;
 
 import org.junit.jupiter.api.Test;
-import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.Arrays;
 
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-class ShellSortTest extends SortTester{
+
+class ShellSortTest extends SortTester {
     @Test
     void testSortInt() {
         int[] arr = generateIntArray(testSize);
-        int[] sorted = QuickSort.sort(arr);
+        int[] sorted = new ShellSort().sort(arr);
 
         assertEquals(arr, sorted);  // should be true since shellsort should be in place
 
@@ -19,10 +21,11 @@ class ShellSortTest extends SortTester{
         Arrays.sort(arraySorted);
         assertArrayEquals(arraySorted, sorted);
     }
+
     @Test
     void testSortDouble() {
         double[] arr = generateDoubleArray(testSize);
-        double[] sorted = QuickSort.sort(arr);
+        double[] sorted = new ShellSort().sort(arr);
 
         assertEquals(arr, sorted);  // should be true since shellsort should be in place
 
@@ -31,10 +34,11 @@ class ShellSortTest extends SortTester{
         Arrays.sort(arraySorted);
         assertArrayEquals(arraySorted, sorted);
     }
+
     @Test
     void testSortInteger() {
         Integer[] arr = generateIntegerArray(testSize);
-        Integer[] sorted = QuickSort.sort(arr);
+        Integer[] sorted = new ShellSort().sort(arr);
 
         assertEquals(arr, sorted);  // should be true since shellsort should be in place
 

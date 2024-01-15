@@ -1,65 +1,14 @@
 package structures;
 
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 
 @SuppressWarnings("unchecked")
 public class SCHashMap<K, V> implements Map<K, V> {
-    private class Node implements Entry<K, V> {
-        private K key;
-        private V val;
-
-        public Node(K key, V val) {
-            this.key = key;
-            this.val = val;
-        }
-
-        @Override
-        public K getKey() {
-            return key;
-        }
-
-        @Override
-        public V getValue() {
-            return val;
-        }
-
-        @Override
-        public V setValue(V value) {
-            this.val = value;
-            return val;
-        }
-
-        @Override
-        public int hashCode() {
-            return Objects.hash(key);
-        }
-
-        public boolean equals(Object o) {
-            try {
-                Node n = (Node) o;
-                return key.equals(n.key) && val.equals(n.val);
-            } catch (ClassCastException e) {
-                return false;
-            }
-        }
-
-        public String toString() {
-            return "{" + key + ":" + val + "}";
-        }
-    }
-
     private static final double MAX_LOAD_FACTOR = .75F;
     private static final int INITIAL_SIZE = 16;
-    private double maxLoadFactor;
+    private final double maxLoadFactor;
     private int size;
     private ArrayList<LinkedList<Node>> hashTable;
-
     // separately chained hashmap
     public SCHashMap() {
         this(MAX_LOAD_FACTOR);
@@ -97,10 +46,6 @@ public class SCHashMap<K, V> implements Map<K, V> {
         return null;
     }
 
-    // =================================
-    // Get Section
-    // =================================
-
     @Override
     public V get(Object key) {
         int idx = getIdx(key);
@@ -117,6 +62,10 @@ public class SCHashMap<K, V> implements Map<K, V> {
 
         return null;
     }
+
+    // =================================
+    // Get Section
+    // =================================
 
     @Override
     public boolean containsKey(Object key) {
@@ -211,10 +160,6 @@ public class SCHashMap<K, V> implements Map<K, V> {
         }
     }
 
-    // =================================
-    // Misc Section
-    // =================================
-
     @Override
     public void clear() {
         for (int i = 0; i < hashTable.size(); ++i) {
@@ -222,6 +167,10 @@ public class SCHashMap<K, V> implements Map<K, V> {
         }
         size = 0;
     }
+
+    // =================================
+    // Misc Section
+    // =================================
 
     @Override
     public int size() {
@@ -284,5 +233,49 @@ public class SCHashMap<K, V> implements Map<K, V> {
 
     public String toString() {
         return hashTable.toString();
+    }
+
+    private class Node implements Entry<K, V> {
+        private final K key;
+        private V val;
+
+        public Node(K key, V val) {
+            this.key = key;
+            this.val = val;
+        }
+
+        @Override
+        public K getKey() {
+            return key;
+        }
+
+        @Override
+        public V getValue() {
+            return val;
+        }
+
+        @Override
+        public V setValue(V value) {
+            this.val = value;
+            return val;
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(key);
+        }
+
+        public boolean equals(Object o) {
+            try {
+                Node n = (Node) o;
+                return key.equals(n.key) && val.equals(n.val);
+            } catch (ClassCastException e) {
+                return false;
+            }
+        }
+
+        public String toString() {
+            return "{" + key + ":" + val + "}";
+        }
     }
 }

@@ -1,117 +1,13 @@
 package structures;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.NoSuchElementException;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Consumer;
 
 @SuppressWarnings("unchecked")
 public class AVL<K extends Comparable<K>, V> implements Map<K, V> {
-    private class AVLBFSIterator implements Iterator<Node> {
-        ArrayList<Node> curLevel;
-        ArrayList<Node> nextLevel;
-        int idx = 0;
-
-        public AVLBFSIterator(Node root) {
-            curLevel = new ArrayList<>();
-            nextLevel = new ArrayList<>();
-            idx = 0;
-            if (root != null) {
-                curLevel.add(root);
-            }
-        }
-
-        @Override
-        public Node next() {
-            // safety
-            if (!hasNext()) {
-                throw new NoSuchElementException();
-            }
-
-            // incremental bfs
-            Node ret = curLevel.get(idx++);
-            if (ret.left != null) {
-                nextLevel.add(ret.left);
-            }
-            if (ret.right != null) {
-                nextLevel.add(ret.right);
-            }
-            return ret;
-        }
-
-        @Override
-        public boolean hasNext() {
-            // advance to the next level
-            if (idx == curLevel.size()) {
-                idx = 0;
-                changeLevel();
-            }
-            return !curLevel.isEmpty();
-        }
-
-        private void changeLevel() {
-            curLevel = nextLevel;
-            nextLevel = new ArrayList<>();
-        }
-    }
-
-    private class Node implements Entry<K, V> {
-        K key;
-        V val;
-        Node left;
-        Node right;
-        int height;
-
-        public Node(K key, V val) {
-            this.key = key;
-            this.val = val;
-            this.height = 1;
-        }
-
-        public int getBalance() {
-            // BF(x) = Height(right_subtree(x)) - Height(left_subtree(x))
-            return (right == null ? 0 : right.height) - (left == null ? 0 : left.height);
-        }
-
-        public String toString() {
-            return "" + key + ":" + val + "{" + (left == null ? "" : left) + "," + (right == null ? "" : right) + "}";
-        }
-
-        public void updateHeight() {
-            // should be called in a bottom up way
-            // otherwise this won't work
-            height = Math.max((left == null ? 0 : left.height) + 1, (right == null ? 0 : right.height + 1));
-        }
-
-        @Override
-        public K getKey() {
-            return key;
-        }
-
-        @Override
-        public V getValue() {
-            return val;
-        }
-
-        @Override
-        public V setValue(V value) {
-            val = value;
-            return val;
-        }
-
-    }
-
     // AVL attributes
     private Node root = null;
     private int size = 0;
-
-    // ========================================
-    // Miscellaneous Section
-    // ========================================
 
     public String toString() {
         return root == null ? "{}" : root.toString();
@@ -121,6 +17,10 @@ public class AVL<K extends Comparable<K>, V> implements Map<K, V> {
     public boolean isEmpty() {
         return size == 0;
     }
+
+    // ========================================
+    // Miscellaneous Section
+    // ========================================
 
     @Override
     public int size() {
@@ -132,10 +32,6 @@ public class AVL<K extends Comparable<K>, V> implements Map<K, V> {
         root = null;
     }
 
-    // ========================================
-    // Search Section
-    // ========================================
-
     private void useIterator(Iterator<Node> iterator, Consumer<Node> c) {
         while (iterator.hasNext()) {
             c.accept(iterator.next());
@@ -146,6 +42,10 @@ public class AVL<K extends Comparable<K>, V> implements Map<K, V> {
     public V get(Object key) {
         return getOrDefault(key, null);
     }
+
+    // ========================================
+    // Search Section
+    // ========================================
 
     @Override
     public V getOrDefault(Object key, V defaultValue) {
@@ -223,10 +123,6 @@ public class AVL<K extends Comparable<K>, V> implements Map<K, V> {
         return ret;
     }
 
-    // ========================================
-    // Deletion Section
-    // ========================================
-
     @Override
     public V remove(Object key) {
         try {
@@ -251,9 +147,13 @@ public class AVL<K extends Comparable<K>, V> implements Map<K, V> {
         return ret;
     }
 
+    // ========================================
+    // Deletion Section
+    // ========================================
+
     /**
      * Attempts to delete `key` from cur's subtree
-     * 
+     *
      * @param cur - the Node to start searching at
      * @param key - the key to search for and delete
      * @return V - the value stored at that Node, or null if it wasn't found
@@ -294,10 +194,10 @@ public class AVL<K extends Comparable<K>, V> implements Map<K, V> {
     /**
      * Deletes the given node, and returns either null or the resulting
      * subtree (formed via the inorder successor)
-     * 
+     *
      * @param node - the node to remove from the tree
      * @return Node - the new Node at this position after balancing, or null if no
-     *         Node will exist here
+     * Node will exist here
      */
     private Node delete(Node node) {
         // leaf node; easy delete
@@ -330,7 +230,7 @@ public class AVL<K extends Comparable<K>, V> implements Map<K, V> {
     /**
      * Deletes the inorder sucessor and takes care of balancing
      * any nodes that were disturbed
-     * 
+     *
      * @param start - should have a non-null right
      * @return
      */
@@ -355,7 +255,7 @@ public class AVL<K extends Comparable<K>, V> implements Map<K, V> {
     /**
      * Delete the inorder successor and balance all the affected
      * nodes between the deleted inorder successor and the starting node
-     * 
+     *
      * @param cur - the node to start at
      * @return Node - the deleted inorder successor
      */
@@ -378,10 +278,6 @@ public class AVL<K extends Comparable<K>, V> implements Map<K, V> {
         }
     }
 
-    // ========================================
-    // Insertion section
-    // ========================================
-
     @Override
     public V put(K key, V val) {
         if (root == null) {
@@ -401,9 +297,13 @@ public class AVL<K extends Comparable<K>, V> implements Map<K, V> {
         }
     }
 
+    // ========================================
+    // Insertion section
+    // ========================================
+
     /**
      * Recursively add (key, val), starting at cur
-     * 
+     *
      * @param cur - the current Node
      * @param key - the key to add. If the key already exists, then the node is
      *            updated and no new node is added
@@ -443,11 +343,11 @@ public class AVL<K extends Comparable<K>, V> implements Map<K, V> {
 
     /**
      * Check if cur needs to be rotated, and if so, perform the necessary rotation
-     * 
+     *
      * @param cur - the node to check and possible rotate
      * @return Node - the node at this spot (either the original node if no rotation
-     *         was performed
-     *         or the node that took this spot after rotation)
+     * was performed
+     * or the node that took this spot after rotation)
      */
     private Node checkRotate(Node cur) {
         if (cur == null) {
@@ -460,7 +360,7 @@ public class AVL<K extends Comparable<K>, V> implements Map<K, V> {
                     // so we just do a left rotate
                     cur = leftRotate(cur);
                 } else { // cur.right.balance == -1
-                         // do a right left rotate
+                    // do a right left rotate
                     cur.right = rightRotate(cur.right);
                     cur = leftRotate(cur);
                 }
@@ -481,7 +381,7 @@ public class AVL<K extends Comparable<K>, V> implements Map<K, V> {
 
     /**
      * Performs a left rotate and updates the heights of the nodes involved
-     * 
+     *
      * @param origin - has bf of 2
      * @return new origin
      */
@@ -500,7 +400,7 @@ public class AVL<K extends Comparable<K>, V> implements Map<K, V> {
 
     /**
      * Performs a right rotate and updates the heights of the nodes involved
-     * 
+     *
      * @param origin - has bf of -2
      * @return new origin
      */
@@ -515,5 +415,99 @@ public class AVL<K extends Comparable<K>, V> implements Map<K, V> {
         origin.updateHeight(); // update origin height first since ret height depends on that
         ret.updateHeight();
         return ret;
+    }
+
+    private class AVLBFSIterator implements Iterator<Node> {
+        ArrayList<Node> curLevel;
+        ArrayList<Node> nextLevel;
+        int idx = 0;
+
+        public AVLBFSIterator(Node root) {
+            curLevel = new ArrayList<>();
+            nextLevel = new ArrayList<>();
+            idx = 0;
+            if (root != null) {
+                curLevel.add(root);
+            }
+        }
+
+        @Override
+        public Node next() {
+            // safety
+            if (!hasNext()) {
+                throw new NoSuchElementException();
+            }
+
+            // incremental bfs
+            Node ret = curLevel.get(idx++);
+            if (ret.left != null) {
+                nextLevel.add(ret.left);
+            }
+            if (ret.right != null) {
+                nextLevel.add(ret.right);
+            }
+            return ret;
+        }
+
+        @Override
+        public boolean hasNext() {
+            // advance to the next level
+            if (idx == curLevel.size()) {
+                idx = 0;
+                changeLevel();
+            }
+            return !curLevel.isEmpty();
+        }
+
+        private void changeLevel() {
+            curLevel = nextLevel;
+            nextLevel = new ArrayList<>();
+        }
+    }
+
+    private class Node implements Entry<K, V> {
+        K key;
+        V val;
+        Node left;
+        Node right;
+        int height;
+
+        public Node(K key, V val) {
+            this.key = key;
+            this.val = val;
+            this.height = 1;
+        }
+
+        public int getBalance() {
+            // BF(x) = Height(right_subtree(x)) - Height(left_subtree(x))
+            return (right == null ? 0 : right.height) - (left == null ? 0 : left.height);
+        }
+
+        public String toString() {
+            return key + ":" + val + "{" + (left == null ? "" : left) + "," + (right == null ? "" : right) + "}";
+        }
+
+        public void updateHeight() {
+            // should be called in a bottom up way
+            // otherwise this won't work
+            height = Math.max((left == null ? 0 : left.height) + 1, (right == null ? 0 : right.height + 1));
+        }
+
+        @Override
+        public K getKey() {
+            return key;
+        }
+
+        @Override
+        public V getValue() {
+            return val;
+        }
+
+        @Override
+        public V setValue(V value) {
+            val = value;
+            return val;
+        }
+
     }
 }

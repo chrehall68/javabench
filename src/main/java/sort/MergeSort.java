@@ -2,13 +2,14 @@ package sort;
 
 import java.util.Arrays;
 
-public class MergeSort {
+public class MergeSort implements ISorter {
     /**
      * Sorts the array using mergesort
+     *
      * @param arr - array to be sorted
      * @param <T> - type of array to sort
      */
-    public static <T extends  Comparable<T>> T[] sort(T[] arr){
+    public <T extends Comparable<T>> T[] sort(T[] arr) {
         // recursive case
         if (arr.length > 1) {
             int half = arr.length / 2;
@@ -37,11 +38,13 @@ public class MergeSort {
         }
         return arr;  // base (or recursive) case
     }
+
     /**
      * Sorts the array using mergesort for primitive ints
+     *
      * @param arr - array to be sorted
      */
-    public static int[] sort(int[] arr){
+    public int[] sort(int[] arr) {
         // recursive case
         if (arr.length > 1) {
             int half = arr.length / 2;
@@ -70,11 +73,13 @@ public class MergeSort {
         }
         return arr;  // base (or recursive) case
     }
+
     /**
      * Sorts the array using mergesort for primitive doubles
+     *
      * @param arr - array to be sorted
      */
-    public static double[] sort(double[] arr){
+    public double[] sort(double[] arr) {
         // recursive case
         if (arr.length > 1) {
             int half = arr.length / 2;

@@ -10,86 +10,6 @@ import java.util.function.Predicate;
 @SuppressWarnings("unchecked")
 public class JBLinkedList<T> implements Deque<T> {
 
-    private class Node {
-        private T val;
-        private Node next;
-        private Node prev;
-
-        public Node() {
-            this.val = null;
-        }
-
-        public Node(T val) {
-            this.val = val;
-        }
-
-        public Node getNext() {
-            return next;
-        }
-
-        public Node getPrev() {
-            return prev;
-        }
-
-        public T getVal() {
-            return val;
-        }
-
-        public void setNext(Node next) {
-            this.next = next;
-        }
-
-        public void setPrev(Node prev) {
-            this.prev = prev;
-        }
-    }
-
-    private class JBLinkedListForwardIterator implements Iterator<T> {
-        Node cur;
-
-        public JBLinkedListForwardIterator(Node cur) {
-            this.cur = new Node();
-            this.cur.setNext(cur);
-        }
-
-        @Override
-        public boolean hasNext() {
-            return cur != null && cur.getNext() != null;
-        }
-
-        @Override
-        public T next() {
-            if (!hasNext()) {
-                throw new NoSuchElementException();
-            }
-            cur = cur.getNext();
-            return cur.getVal();
-        }
-    }
-
-    private class JBLinkedListBackwardsIterator implements Iterator<T> {
-        Node cur;
-
-        public JBLinkedListBackwardsIterator(Node cur) {
-            this.cur = new Node();
-            this.cur.setPrev(cur);
-        }
-
-        @Override
-        public boolean hasNext() {
-            return cur != null && cur.getPrev() != null;
-        }
-
-        @Override
-        public T next() {
-            if (!hasNext()) {
-                throw new NoSuchElementException();
-            }
-            cur = cur.getPrev();
-            return cur.getVal();
-        }
-    }
-
     // actual Linked List stuff
     private Node head;
     private Node tail;
@@ -396,7 +316,7 @@ public class JBLinkedList<T> implements Deque<T> {
             cur.getNext();
         }
         return ret;
-    };
+    }
 
     @Override
     public T element() {
@@ -439,5 +359,85 @@ public class JBLinkedList<T> implements Deque<T> {
         }
         ret += cur.getVal() + "]";
         return ret;
+    }
+
+    private class Node {
+        private final T val;
+        private Node next;
+        private Node prev;
+
+        public Node() {
+            this.val = null;
+        }
+
+        public Node(T val) {
+            this.val = val;
+        }
+
+        public Node getNext() {
+            return next;
+        }
+
+        public void setNext(Node next) {
+            this.next = next;
+        }
+
+        public Node getPrev() {
+            return prev;
+        }
+
+        public void setPrev(Node prev) {
+            this.prev = prev;
+        }
+
+        public T getVal() {
+            return val;
+        }
+    }
+
+    private class JBLinkedListForwardIterator implements Iterator<T> {
+        Node cur;
+
+        public JBLinkedListForwardIterator(Node cur) {
+            this.cur = new Node();
+            this.cur.setNext(cur);
+        }
+
+        @Override
+        public boolean hasNext() {
+            return cur != null && cur.getNext() != null;
+        }
+
+        @Override
+        public T next() {
+            if (!hasNext()) {
+                throw new NoSuchElementException();
+            }
+            cur = cur.getNext();
+            return cur.getVal();
+        }
+    }
+
+    private class JBLinkedListBackwardsIterator implements Iterator<T> {
+        Node cur;
+
+        public JBLinkedListBackwardsIterator(Node cur) {
+            this.cur = new Node();
+            this.cur.setPrev(cur);
+        }
+
+        @Override
+        public boolean hasNext() {
+            return cur != null && cur.getPrev() != null;
+        }
+
+        @Override
+        public T next() {
+            if (!hasNext()) {
+                throw new NoSuchElementException();
+            }
+            cur = cur.getPrev();
+            return cur.getVal();
+        }
     }
 }

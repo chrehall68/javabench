@@ -1,16 +1,17 @@
 package sort;
 
+import org.junit.jupiter.api.Test;
+
 import java.util.Arrays;
 
-import org.junit.jupiter.api.Test;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 
-class MergeSortTest extends  SortTester{
+class MergeSortTest extends SortTester {
     @Test
     void testSortGeneric() {
         Integer[] arr = generateIntegerArray(testSize);
 
-        Integer[] mergeSortedArr = MergeSort.sort(Arrays.copyOf(arr, arr.length));
+        Integer[] mergeSortedArr = new MergeSort().sort(Arrays.copyOf(arr, arr.length));
         Arrays.sort(arr);
         assertArrayEquals(mergeSortedArr, arr);
     }
@@ -18,7 +19,7 @@ class MergeSortTest extends  SortTester{
     @Test
     void testSortInt() {
         int[] arr = generateIntArray(testSize);
-        int[] mergeSortedArr = MergeSort.sort(Arrays.copyOf(arr, arr.length));
+        int[] mergeSortedArr = new MergeSort().sort(Arrays.copyOf(arr, arr.length));
         Arrays.sort(arr);
         assertArrayEquals(mergeSortedArr, arr);
     }
@@ -26,7 +27,7 @@ class MergeSortTest extends  SortTester{
     @Test
     void testSortDouble() {
         double[] arr = generateDoubleArray(testSize);
-        double[] mergeSortedArr = MergeSort.sort(Arrays.copyOf(arr, arr.length));
+        double[] mergeSortedArr = new MergeSort().sort(Arrays.copyOf(arr, arr.length));
         Arrays.sort(arr);
         assertArrayEquals(mergeSortedArr, arr);
     }

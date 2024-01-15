@@ -1,13 +1,14 @@
 package sort;
 
-public class ShellSort {
-    public static <E extends Comparable<E>> void sort(E[] arr) {
+public class ShellSort implements ISorter {
+    public <E extends Comparable<E>> E[] sort(E[] arr) {
         for (int k = Math.max(arr.length / 3, 1); k > 0; --k) {
             bubbleSort(arr, k);
         }
+        return arr;
     }
 
-    private static <E extends Comparable<E>> void bubbleSort(E[] arr, int k) {
+    private <E extends Comparable<E>> void bubbleSort(E[] arr, int k) {
         for (int i = arr.length - k; i > -1; --i) {
             for (int j = i + k; j < arr.length; j += k) {
                 // already sorted
@@ -23,13 +24,14 @@ public class ShellSort {
         }
     }
 
-    public static void sort(int[] arr) {
+    public int[] sort(int[] arr) {
         for (int k = Math.max(arr.length / 3, 1); k > 0; --k) {
             bubbleSort(arr, k);
         }
+        return arr;
     }
 
-    private static void bubbleSort(int[] arr, int k) {
+    private void bubbleSort(int[] arr, int k) {
         for (int i = arr.length - k; i > -1; --i) {
             for (int j = i + k; j < arr.length; j += k) {
                 // already sorted
@@ -44,13 +46,15 @@ public class ShellSort {
             }
         }
     }
-    public static void sort(double[] arr) {
+
+    public double[] sort(double[] arr) {
         for (int k = Math.max(arr.length / 3, 1); k > 0; --k) {
             bubbleSort(arr, k);
         }
+        return arr;
     }
 
-    private static void bubbleSort(double[] arr, int k) {
+    private void bubbleSort(double[] arr, int k) {
         for (int i = arr.length - k; i > -1; --i) {
             for (int j = i + k; j < arr.length; j += k) {
                 // already sorted
