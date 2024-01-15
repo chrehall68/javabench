@@ -364,16 +364,16 @@ public class Main {
     }
 
     public static void main(String[] args) {
-        stressTest();
+        // stressTest();
         // llTest();
         // treeTest();
         // pqTest();
         // hashmapTest();
         // qTest();
 
-        // Integer[] arr = { 6, 3, 8, 1, 9, 4, 8 };
-        // System.out.println(Arrays.toString(arr));
-        // ShellSort.sort(arr);
-        // System.out.println(Arrays.toString(arr));
+        Integer[] arr = {6, 3, 8, 1, 9, 4, 8, 2};
+        System.out.println(Arrays.toString(arr));
+        ArrayHeap.heapSort(arr);
+        System.out.println(Arrays.toString(arr));
     }
 }

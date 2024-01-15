@@ -1,6 +1,7 @@
 package sort;
 
 import org.junit.jupiter.api.Test;
+import resources.ArrayGenerator;
 
 import java.util.Arrays;
 
@@ -8,10 +9,10 @@ import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 
-class QuickSortTest extends SortTester {
+class QuickSortTest {
     @Test
     void testSortInt() {
-        int[] arr = generateIntArray(testSize);
+        int[] arr = ArrayGenerator.generateIntArray();
         int[] sorted = new QuickSort().sort(arr);
 
         assertEquals(arr, sorted);  // should be true since quicksort should be in place
@@ -24,7 +25,7 @@ class QuickSortTest extends SortTester {
 
     @Test
     void testSortDouble() {
-        double[] arr = generateDoubleArray(testSize);
+        double[] arr = ArrayGenerator.generateDoubleArray();
         double[] sorted = new QuickSort().sort(arr);
 
         assertEquals(arr, sorted);  // should be true since quicksort should be in place
@@ -37,7 +38,7 @@ class QuickSortTest extends SortTester {
 
     @Test
     void testSortInteger() {
-        Integer[] arr = generateIntegerArray(testSize);
+        Integer[] arr = ArrayGenerator.generateIntegerArray();
         Integer[] sorted = new QuickSort().sort(arr);
 
         assertEquals(arr, sorted);  // should be true since quicksort should be in place

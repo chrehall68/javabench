@@ -13,6 +13,10 @@ public class ArrayHeap<E> implements Queue<E> {
     private int last;
     private Comparator<? super E> comparator;
     private int height;
+
+    /**
+     * Creates a Max Heap by default. To change this, pass Comparator.reverseOrder()
+     */
     public ArrayHeap() {
         this(INITIAL_SIZE);
     }
@@ -47,11 +51,12 @@ public class ArrayHeap<E> implements Queue<E> {
      *
      * @param <E> - type of the array
      * @param arr - the array to be sorted, in-place
+     * @return arr - the input array, sorted in-place
      */
-    public static <E> void heapSort(E[] arr) {
-        ArrayHeap<E> h = new ArrayHeap<E>(arr);
+    public static <E> E[] heapSort(E[] arr) {
+        ArrayHeap<E> h = new ArrayHeap<>(arr);
         // first, heapify
-        for (int i = 0; i < arr.length; ++i) {
+        for (int i = arr.length - 1; i > -1; --i) {
             h.heapifyDown(i);
         }
 
@@ -59,6 +64,7 @@ public class ArrayHeap<E> implements Queue<E> {
         for (int i = arr.length - 1; i > -1; --i) {
             arr[i] = h.poll();
         }
+        return arr;
     }
 
     // ==============================
@@ -244,7 +250,7 @@ public class ArrayHeap<E> implements Queue<E> {
 
     @Override
     public boolean addAll(Collection<? extends E> c) {
-        c.forEach(element -> add(element));
+        c.forEach(this::add);
         return true;
     }
 
@@ -256,7 +262,7 @@ public class ArrayHeap<E> implements Queue<E> {
     /**
      * Heapify starting from idx and going to children
      *
-     * @param idx
+     * @param idx - idx to start from
      */
     private void heapifyDown(int idx) {
         // invalid idx
