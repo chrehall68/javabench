@@ -4,6 +4,7 @@ import org.openjdk.jmh.annotations.*;
 import org.openjdk.jmh.infra.Blackhole;
 import sort.MergeSort;
 import sort.QuickSort;
+import sort.Radix;
 import sort.ShellSort;
 import structures.ArrayHeap;
 
@@ -18,7 +19,6 @@ interface IntegerSorter {
 }
 
 public class SortBenchmarker {
-
     @Fork(value = 1)
     @OutputTimeUnit(TimeUnit.MILLISECONDS)
     @BenchmarkMode(value = Mode.AverageTime)
@@ -35,7 +35,6 @@ public class SortBenchmarker {
         benchmarkSort(blackhole, generateIntegerArray(), e -> new ShellSort().sort(e));
     }
 
-
     @Fork(value = 1)
     @OutputTimeUnit(TimeUnit.MILLISECONDS)
     @BenchmarkMode(value = Mode.AverageTime)
@@ -43,7 +42,6 @@ public class SortBenchmarker {
     public void benchmarkQuicksortInteger(final Blackhole blackhole) {
         benchmarkSort(blackhole, generateIntegerArray(), e -> new QuickSort().sort(e));
     }
-
 
     @Fork(value = 1)
     @OutputTimeUnit(TimeUnit.MILLISECONDS)
@@ -57,6 +55,14 @@ public class SortBenchmarker {
     @OutputTimeUnit(TimeUnit.MILLISECONDS)
     @BenchmarkMode(value = Mode.AverageTime)
     @Benchmark
+    public void benchmarkRadixsortInteger(final Blackhole blackhole) {
+        benchmarkSort(blackhole, generateIntegerArray(), e -> new Radix().sort(e));
+    }
+
+    @Fork(value = 1)
+    @OutputTimeUnit(TimeUnit.MILLISECONDS)
+    @BenchmarkMode(value = Mode.AverageTime)
+    @Benchmark
     public void benchmarkArraysInteger(final Blackhole blackhole) {
         benchmarkSort(blackhole, generateIntegerArray(), e -> {
             Arrays.sort(e);
@@ -64,7 +70,7 @@ public class SortBenchmarker {
         });
     }
 
-    public void benchmarkSort(final Blackhole blackhole, Integer[] arr, IntegerSorter sorter) {
+    private void benchmarkSort(final Blackhole blackhole, Integer[] arr, IntegerSorter sorter) {
         blackhole.consume(sorter.method(arr));
     }
 
