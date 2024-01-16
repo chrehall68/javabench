@@ -15,5 +15,5 @@ Benchmarking classic Data Structures and Algorithms implemented in Java
     - Linked Lists
     - Queues
     - Hash Maps
-- Unit Tests - implemented for all the sorting algorithms
-- Benchmarks - coming soon, currently just in Main.java
+- Unit Tests - implemented for all sorting algorithms and data structures inside
+- Benchmarks - Implemented for all sorting algorithms and data structures inside
