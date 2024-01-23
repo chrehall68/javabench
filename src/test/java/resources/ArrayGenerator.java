@@ -3,11 +3,11 @@ package resources;
 import java.util.Random;
 
 public class ArrayGenerator {
-    private static final int testSize = (int) 1e4;  // length of tests
-    private static final int maxIntVal = (int) 5e3;
-    private static final int minIntVal = -(int) 5e3;
-    private static final double maxDoubleVal = maxIntVal;
-    private static final double minDoubleVal = minIntVal;
+    public static final int testSize = (int) 1e4;  // length of tests
+    public static final int maxIntVal = (int) 5e3;
+    public static final int minIntVal = -(int) 5e3;
+    public static final double maxDoubleVal = maxIntVal;
+    public static final double minDoubleVal = minIntVal;
 
     public static int[] generateIntArray() {
         int[] arr = new int[testSize];

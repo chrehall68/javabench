@@ -11,18 +11,15 @@ import java.util.function.Predicate;
 public class JBLinkedList<T> implements Deque<T> {
 
     // actual Linked List stuff
-    private Node head;
-    private Node tail;
+    private final Node sentinel;
     private int size;
 
-    @Override
+    public JBLinkedList() {
+        sentinel = new Node(null);
+    }
+
     public T poll() {
-        if (this.head == null) {
-            return null;
-        }
-        Node ret = head;
-        removeNode(ret);
-        return ret.getVal();
+        return sentinel.removeNext().getVal();
     }
 
     @Override
@@ -32,12 +29,7 @@ public class JBLinkedList<T> implements Deque<T> {
 
     @Override
     public T pollLast() {
-        if (this.tail == null) {
-            return null;
-        }
-        Node ret = tail;
-        removeNode(ret);
-        return ret.getVal();
+        return sentinel.removePrev().getVal();
     }
 
     @Override
@@ -47,12 +39,12 @@ public class JBLinkedList<T> implements Deque<T> {
 
     @Override
     public T peekFirst() {
-        return this.head == null ? null : this.head.getVal();
+        return isEmpty() ? null : sentinel.getNext().getVal();
     }
 
     @Override
     public T peekLast() {
-        return this.tail == null ? null : this.tail.getVal();
+        return isEmpty() ? null : sentinel.getPrev().getVal();
     }
 
     @Override
@@ -60,7 +52,7 @@ public class JBLinkedList<T> implements Deque<T> {
         if (this.isEmpty()) {
             throw new NoSuchElementException();
         }
-        return this.head.getVal();
+        return sentinel.getNext().getVal();
     }
 
     @Override
@@ -68,7 +60,7 @@ public class JBLinkedList<T> implements Deque<T> {
         if (this.isEmpty()) {
             throw new NoSuchElementException();
         }
-        return this.tail.getVal();
+        return sentinel.getPrev().getVal();
     }
 
     @Override
@@ -107,39 +99,19 @@ public class JBLinkedList<T> implements Deque<T> {
         return removeFirst();
     }
 
-    // add section
+    // ==============================
+    // Add Section
+    // ==============================
     @Override
     public boolean add(T e) {
-        Node temp = new Node(e);
-        if (this.head == null) {
-            this.head = temp;
-        }
-
-        if (this.tail == null) {
-            this.tail = temp;
-        } else {
-            this.tail.setNext(temp);
-            temp.setPrev(this.tail);
-            this.tail = temp;
-        }
-
+        sentinel.insertPrev(e);
         ++size;
         return true;
     }
 
     @Override
     public void push(T e) {
-        Node temp = new Node(e);
-        if (this.tail == null) {
-            this.tail = temp;
-        }
-        if (this.head == null) {
-            this.head = temp;
-        } else {
-            this.head.setPrev(temp);
-            temp.setNext(this.head);
-            this.head = temp;
-        }
+        sentinel.insertNext(e);
         ++size;
     }
 
@@ -178,23 +150,24 @@ public class JBLinkedList<T> implements Deque<T> {
         return true;
     }
 
-    // remove section
+    // ==============================
+    // Removal Section
+    // ==============================
     @Override
     public void clear() {
-        this.head = null;
-        this.tail = null;
+        sentinel.next = sentinel;
+        sentinel.prev = sentinel;
         this.size = 0;
     }
 
     @Override
     public boolean remove(Object o) {
-        Node cur = this.head;
-        while (cur != null) {
-            if (cur.getVal().equals(o)) {
-                removeNode(cur);
+        Iterator<T> iterator = new JBLinkedListForwardIterator();
+        while (iterator.hasNext()) {
+            if (iterator.next().equals(o)) {
+                iterator.remove();
                 return true;
             }
-            cur = cur.getNext();
         }
         return false;
     }
@@ -206,13 +179,12 @@ public class JBLinkedList<T> implements Deque<T> {
 
     @Override
     public boolean removeLastOccurrence(Object o) {
-        Node cur = this.tail;
-        while (cur != null) {
-            if (cur.getVal().equals(o)) {
-                removeNode(cur);
+        Iterator<T> iterator = new JBLinkedListBackwardsIterator();
+        while (iterator.hasNext()) {
+            if (iterator.next().equals(o)) {
+                iterator.remove();
                 return true;
             }
-            cur = cur.getPrev();
         }
         return false;
     }
@@ -220,28 +192,25 @@ public class JBLinkedList<T> implements Deque<T> {
     // iterator
     @Override
     public Iterator<T> iterator() {
-        return new JBLinkedListForwardIterator(this.head);
+        return new JBLinkedListForwardIterator();
     }
 
     @Override
     public Iterator<T> descendingIterator() {
-        return new JBLinkedListBackwardsIterator(this.tail);
+        return new JBLinkedListBackwardsIterator();
     }
 
     @Override
     public boolean retainAll(Collection<?> c) {
-        Node cur = this.head;
+        Iterator<T> iterator = new JBLinkedListForwardIterator();
         boolean changed = false;
-        while (cur != null) {
-            // remove it
-            if (!c.contains(cur.getVal())) {
-                Node temp = cur.getNext();
-                removeNode(cur);
-                cur = temp;
 
+        while (iterator.hasNext()) {
+            // remove it
+            T element = iterator.next();
+            if (!c.contains(element)) {
+                iterator.remove();
                 changed = true;
-            } else { // it is contained in c
-                cur = cur.getNext();
             }
         }
         return changed;
@@ -249,18 +218,15 @@ public class JBLinkedList<T> implements Deque<T> {
 
     @Override
     public boolean removeAll(Collection<?> c) {
-        Node cur = this.head;
+        Iterator<T> iterator = new JBLinkedListForwardIterator();
         boolean changed = false;
-        while (cur != null) {
-            // remove it if it is w/i c
-            if (c.contains(cur.getVal())) {
-                Node temp = cur.getNext();
-                removeNode(cur);
-                cur = temp;
 
+        while (iterator.hasNext()) {
+            // remove it if it is w/i c
+            T element = iterator.next();
+            if (c.contains(element)) {
+                iterator.remove();
                 changed = true;
-            } else {
-                cur = cur.getNext();
             }
         }
         return changed;
@@ -268,18 +234,26 @@ public class JBLinkedList<T> implements Deque<T> {
 
     @Override
     public boolean removeIf(Predicate<? super T> filter) {
-        // TODO change
-        return Deque.super.removeIf(filter);
+        Iterator<T> iterator = new JBLinkedListForwardIterator();
+        boolean changed = false;
+
+        while (iterator.hasNext()) {
+            T element = iterator.next();
+            if (filter.test(element)) {
+                iterator.remove();
+                changed = true;
+            }
+        }
+
+        return changed;
     }
 
     @Override
     public boolean contains(Object o) {
-        Node cur = this.head;
-        while (cur != null) {
-            if (cur.getVal().equals(o)) {
+        for (T element : this) {
+            if (element.equals(o)) {
                 return true;
             }
-            cur = cur.getNext();
         }
         return false;
     }
@@ -297,23 +271,20 @@ public class JBLinkedList<T> implements Deque<T> {
     @Override
     public Object[] toArray() {
         Object[] arr = new Object[this.size];
-        Node cur = this.head;
-        for (int i = 0; i < this.size; ++i) {
-            arr[i] = cur.getVal();
-            cur = cur.getNext();
-        }
-        return arr;
+        return this.toArray(arr);
     }
 
-    public <U extends Object> U[] toArray(U[] a) {
+    public <U> U[] toArray(U[] a) {
+        // potentially resize
         U[] ret = a;
         if (a.length < this.size) {
             ret = (U[]) Array.newInstance(a.getClass().getComponentType(), this.size);
         }
-        Node cur = this.head;
-        for (int i = 0; i < this.size; ++i) {
-            ret[i] = (U) cur.getVal();
-            cur.getNext();
+
+        // iterate through and store values
+        int i = 0;
+        for (T element : this) {
+            ret[i++] = (U) element;
         }
         return ret;
     }
@@ -326,49 +297,28 @@ public class JBLinkedList<T> implements Deque<T> {
         return peek();
     }
 
-    // Private Helper Section
-    private void removeNode(Node node) {
-        Node prev = node.getPrev();
-        Node next = node.getNext();
-        if (prev != null) {
-            prev.setNext(next);
-        }
-        if (next != null) {
-            next.setPrev(prev);
-        }
-
-        if (node == this.tail && node == this.head) {
-            this.tail = null;
-            this.head = null;
-        } else if (node == this.head) {
-            this.head = next;
-        } else {
-            this.tail = prev;
-        }
-
-        --size;
-    }
-
     // toString
     public String toString() {
-        String ret = "[";
-        Node cur = this.head;
-        for (int i = 0; i < this.size - 1; ++i) {
-            ret += cur.getVal() + ", ";
-            cur = cur.getNext();
+        StringBuilder ret = new StringBuilder("[");
+        Iterator<T> it = new JBLinkedListForwardIterator();
+
+        if (it.hasNext()) {
+            T element = it.next();
+            while (it.hasNext()) {
+                ret.append(element.toString()).append(", ");
+                element = it.next();
+            }
+            // last bit of the loop for pretty formatting
+            ret.append(element.toString());
         }
-        ret += cur.getVal() + "]";
-        return ret;
+        ret.append("]");
+        return ret.toString();
     }
 
     private class Node {
         private final T val;
         private Node next;
         private Node prev;
-
-        public Node() {
-            this.val = null;
-        }
 
         public Node(T val) {
             this.val = val;
@@ -378,34 +328,81 @@ public class JBLinkedList<T> implements Deque<T> {
             return next;
         }
 
-        public void setNext(Node next) {
-            this.next = next;
-        }
-
         public Node getPrev() {
             return prev;
-        }
-
-        public void setPrev(Node prev) {
-            this.prev = prev;
         }
 
         public T getVal() {
             return val;
         }
+
+        /**
+         * Removes the next node
+         *
+         * @return the removed node
+         */
+        public Node removeNext() {
+            // store val
+            Node node = next;
+            // decrement size
+            size = Math.min(--size, 0);
+
+            // remove connections
+            next = next.next;
+            next.next.prev = this;
+            return node;
+        }
+
+        /**
+         * Removes the previous node
+         *
+         * @return the removed node
+         */
+        public Node removePrev() {
+            // store val
+            Node node = prev;
+            // decrement size
+            size = Math.min(--size, 0);
+
+            // remove connections
+            prev = prev.prev;
+            prev.prev.next = this;
+            return node;
+        }
+
+        public void insertNext(T val) {
+            // set temp's connections
+            Node temp = new Node(val);
+            temp.prev = this;
+            temp.next = next;
+
+            // set our connections
+            next.prev = temp;
+            next = temp;
+        }
+
+        public void insertPrev(T val) {
+            // set temp's connections
+            Node temp = new Node(val);
+            temp.next = this;
+            temp.prev = prev;
+
+            // set our connections
+            prev.next = temp;
+            prev = temp;
+        }
     }
 
     private class JBLinkedListForwardIterator implements Iterator<T> {
-        Node cur;
+        private Node cur;
 
-        public JBLinkedListForwardIterator(Node cur) {
-            this.cur = new Node();
-            this.cur.setNext(cur);
+        public JBLinkedListForwardIterator() {
+            cur = sentinel;
         }
 
         @Override
         public boolean hasNext() {
-            return cur != null && cur.getNext() != null;
+            return cur.getNext() != sentinel;  // address comparison is fine here since sentinel's address will never change
         }
 
         @Override
@@ -416,19 +413,23 @@ public class JBLinkedList<T> implements Deque<T> {
             cur = cur.getNext();
             return cur.getVal();
         }
+
+        @Override
+        public void remove() {
+            cur = cur.getPrev().removeNext();
+        }
     }
 
     private class JBLinkedListBackwardsIterator implements Iterator<T> {
-        Node cur;
+        private Node cur;
 
-        public JBLinkedListBackwardsIterator(Node cur) {
-            this.cur = new Node();
-            this.cur.setPrev(cur);
+        public JBLinkedListBackwardsIterator() {
+            cur = sentinel;
         }
 
         @Override
         public boolean hasNext() {
-            return cur != null && cur.getPrev() != null;
+            return cur.prev != sentinel;
         }
 
         @Override
@@ -438,6 +439,11 @@ public class JBLinkedList<T> implements Deque<T> {
             }
             cur = cur.getPrev();
             return cur.getVal();
+        }
+
+        @Override
+        public void remove() {
+            cur = cur.getNext().removePrev();
         }
     }
 }

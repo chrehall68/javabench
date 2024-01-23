@@ -1,7 +1,12 @@
 package benchmark;
 
-import org.openjdk.jmh.annotations.*;
+import org.openjdk.jmh.annotations.Benchmark;
+import org.openjdk.jmh.annotations.Mode;
 import org.openjdk.jmh.infra.Blackhole;
+import org.openjdk.jmh.runner.Runner;
+import org.openjdk.jmh.runner.RunnerException;
+import org.openjdk.jmh.runner.options.Options;
+import org.openjdk.jmh.runner.options.OptionsBuilder;
 import structures.ArrayQueue;
 import structures.JBLinkedList;
 
@@ -14,67 +19,55 @@ import java.util.stream.IntStream;
 
 import static resources.ArrayGenerator.generateIntegerArray;
 
-public class QueueBenchmarker {
+public class QueueBenchmark {
+    public static void main(String[] args) throws RunnerException {
+        Options options = new OptionsBuilder().include(QueueBenchmark.class.getSimpleName())
+                .warmupForks(0)
+                .warmupIterations(3)
+                .forks(1)
+                .measurementIterations(3)
+                .timeUnit(TimeUnit.MILLISECONDS)
+                .mode(Mode.AverageTime)
+                .build();
+        new Runner(options).run();
+    }
+
     @Benchmark
-    @BenchmarkMode(Mode.AverageTime)
-    @OutputTimeUnit(TimeUnit.MILLISECONDS)
-    @Fork(value = 1)
     public void benchmarkArrayQueueMany(final Blackhole blackhole) {
         benchmarkMany(blackhole, new ArrayQueue<>());
     }
 
     @Benchmark
-    @BenchmarkMode(Mode.AverageTime)
-    @OutputTimeUnit(TimeUnit.MILLISECONDS)
-    @Fork(value = 1)
     public void benchmarkArrayDequeMany(final Blackhole blackhole) {
         benchmarkMany(blackhole, new ArrayDeque<>());
     }
 
     @Benchmark
-    @BenchmarkMode(Mode.AverageTime)
-    @OutputTimeUnit(TimeUnit.MILLISECONDS)
-    @Fork(value = 1)
     public void benchmarkJBLLMany(final Blackhole blackhole) {
         benchmarkMany(blackhole, new JBLinkedList<>());
     }
 
     @Benchmark
-    @BenchmarkMode(Mode.AverageTime)
-    @OutputTimeUnit(TimeUnit.MILLISECONDS)
-    @Fork(value = 1)
     public void benchmarkLLMany(final Blackhole blackhole) {
         benchmarkMany(blackhole, new LinkedList<>());
     }
 
     @Benchmark
-    @BenchmarkMode(Mode.AverageTime)
-    @OutputTimeUnit(TimeUnit.MILLISECONDS)
-    @Fork(value = 1)
     public void benchmarkArrayQueueRepeated(final Blackhole blackhole) {
         benchmarkRepeated(blackhole, new ArrayQueue<>());
     }
 
     @Benchmark
-    @BenchmarkMode(Mode.AverageTime)
-    @OutputTimeUnit(TimeUnit.MILLISECONDS)
-    @Fork(value = 1)
     public void benchmarkArrayDequeRepeated(final Blackhole blackhole) {
         benchmarkRepeated(blackhole, new ArrayDeque<>());
     }
 
     @Benchmark
-    @BenchmarkMode(Mode.AverageTime)
-    @OutputTimeUnit(TimeUnit.MILLISECONDS)
-    @Fork(value = 1)
     public void benchmarkJBLLRepeated(final Blackhole blackhole) {
         benchmarkRepeated(blackhole, new JBLinkedList<>());
     }
 
     @Benchmark
-    @BenchmarkMode(Mode.AverageTime)
-    @OutputTimeUnit(TimeUnit.MILLISECONDS)
-    @Fork(value = 1)
     public void benchmarkLLRepeated(final Blackhole blackhole) {
         benchmarkRepeated(blackhole, new LinkedList<>());
     }
