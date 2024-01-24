@@ -1,5 +1,8 @@
 package sort;
 
+import java.util.ArrayList;
+import java.util.LinkedList;
+
 public class Radix implements ISorter {
     public double[] sort(double[] arr) throws UnsupportedOperationException {
         throw new UnsupportedOperationException();
@@ -131,14 +134,11 @@ public class Radix implements ISorter {
         return maxPower;
     }
 
-    private void emptyBuckets(Integer[] arr, Integer[][] buckets, int[] indexes) {
+    private void emptyBuckets(Integer[] arr, ArrayList<LinkedList<Integer>> buckets) {
         int arrIdx = 0;
-        for (int baseIdx = 0; baseIdx < buckets.length; ++baseIdx) {
-            int tempIdx = 0;
-            while (tempIdx < indexes[baseIdx]) {
-                arr[arrIdx] = buckets[baseIdx][tempIdx];
-                ++arrIdx;
-                ++tempIdx;
+        for (LinkedList<Integer> bucket : buckets) {
+            while (!bucket.isEmpty()) {
+                arr[arrIdx++] = bucket.poll();
             }
         }
     }
@@ -148,48 +148,36 @@ public class Radix implements ISorter {
         int maxPower = getMaxPower(arr, base);
 
         // initialize buckets
-        Integer[][] buckets = new Integer[base][arr.length];
+        ArrayList<LinkedList<Integer>> buckets = new ArrayList<>(base);
+        for (int i = 0; i < base; ++i) {
+            buckets.add(new LinkedList<>());
+        }
 
         // sort
         int curVal = 1;
         for (int i = 0; i < maxPower; ++i) {
-            int[] idxs = new int[base];
             for (int val : arr) {
                 int idx = ((val < 0 ? -val : val) / curVal) % base;
 
-                buckets[idx][idxs[idx]] = val;
-                ++idxs[idx];
+                buckets.get(idx).add(val);
             }
 
             // empty buckets
-            emptyBuckets(arr, buckets, idxs);
+            emptyBuckets(arr, buckets);
             curVal *= base;
         }
 
         // take care of negatives
         // sort by negatives
-        int bucket0Idx = 0;
-        int bucket1Idx = 0;
         for (int val : arr) {
             if (val < 0) {
-                buckets[0][bucket0Idx] = val;
-                ++bucket0Idx;
+                buckets.get(0).addFirst(val);  // add first for reversed order (big numbers that are negative are smaller)
             } else {
-                buckets[1][bucket1Idx] = val;
-                ++bucket1Idx;
+                buckets.get(1).add(val);
             }
         }
         // empty buckets
-        int arrIdx = 0;
-        while (arrIdx < arr.length) {
-            if (arrIdx < bucket0Idx) {
-                arr[arrIdx] = buckets[0][bucket0Idx - 1 - arrIdx];
-            } else {
-                arr[arrIdx] = buckets[1][arrIdx - bucket0Idx];
-            }
-            ++arrIdx;
-        }
-
+        emptyBuckets(arr, buckets);
         return arr;
     }
 }
