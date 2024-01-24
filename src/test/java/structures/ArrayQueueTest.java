@@ -53,4 +53,14 @@ class ArrayQueueTest {
             assertEquals(arr[arr.length - 1 - i], arrayQueue.poll());
         }
     }
+
+    @Test
+    void resize() {
+        int initialMaxSize = arrayQueue.maxSize();
+        arrayQueue.addAll(Arrays.asList(arr));
+        for (int i = 0; i < arr.length; ++i) {
+            arrayQueue.poll();
+        }
+        assertEquals(initialMaxSize, arrayQueue.maxSize());
+    }
 }

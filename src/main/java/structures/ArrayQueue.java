@@ -8,10 +8,12 @@ import java.util.Queue;
 @SuppressWarnings("unchecked")
 public class ArrayQueue<E> implements Queue<E> {
     private static final int INITIAL_SIZE = 16;
+    private static final double GROWTH_FACTOR = 1.32;
     private Object[] arr;
     private int first;
     private int last;
     private int size;
+
     public ArrayQueue() {
         this(INITIAL_SIZE);
     }
@@ -106,17 +108,17 @@ public class ArrayQueue<E> implements Queue<E> {
     }
 
     public String toString() {
-        String ret = "{";
+        StringBuilder ret = new StringBuilder("{");
         Iterator<E> it = iterator();
         while (it.hasNext()) {
-            ret += it.next();
+            ret.append(it.next());
             if (it.hasNext()) {
-                ret += ", ";
+                ret.append(", ");
             }
         }
-        ret += "}";
+        ret.append("}");
 
-        return ret;
+        return ret.toString();
     }
 
     // ==============================
@@ -128,6 +130,7 @@ public class ArrayQueue<E> implements Queue<E> {
             return null;
         }
         --size;
+        maybeResize();
         return (E) arr[(first++) % arr.length];
     }
 
@@ -177,25 +180,43 @@ public class ArrayQueue<E> implements Queue<E> {
 
     private void maybeResize() {
         if (size == arr.length) {
-            resize();
+            resizeGrow();
+        }
+        if (arr.length > INITIAL_SIZE && size < arr.length / (GROWTH_FACTOR * GROWTH_FACTOR)) {
+            resizeShrink();
         }
     }
 
-    private void resize() {
-        Object[] nextArr = new Object[arr.length * 2];
+    private void resizeGrow() {
+        resizeGrow((int) (arr.length * GROWTH_FACTOR));
+    }
+
+    private void resizeGrow(int newLength) {
+        Object[] nextArr = new Object[newLength];
         toArray(nextArr);
         arr = nextArr;
 
         first = 0;
         last = size;
+    }
 
+    private void resizeShrink() {
+        resizeShrink(Math.max((int) (arr.length / GROWTH_FACTOR), INITIAL_SIZE));
+    }
+
+    private void resizeShrink(int newLength) {
+        Object[] nextArr = new Object[newLength];
+        toArray(nextArr);
+        arr = nextArr;
+        first = 0;
+        last = size;
     }
 
     @Override
     public boolean addAll(Collection<? extends E> c) {
         // resize beforehand if necessary to prevent more operations
         if (arr.length < size + c.size()) {
-            resize();
+            resizeGrow(size + c.size());
         }
 
         for (E e : c) {
